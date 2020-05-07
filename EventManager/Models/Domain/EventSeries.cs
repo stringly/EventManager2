@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace EventManager.Models.Domain
 {
@@ -10,6 +8,17 @@ namespace EventManager.Models.Domain
     {
         [Key]
         public int EventSeriesId { get; set; }
+        public string Title { get;set;}
+        public string Description { get; set;}
         public virtual ICollection<Event> Events { get; set; }
+
+        public List<Event> AvailableEvents()
+        {
+            return Events?.Where(x => x.IsOpenForRegistrations() == true).ToList() ?? new List<Event>();
+        }
+        public bool HasAvailableEvents()
+        {
+            return Events?.Any(x => x.IsOpenForRegistrations() == true) ?? false;
+        }
     }
 }

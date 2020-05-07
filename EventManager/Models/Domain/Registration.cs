@@ -1,10 +1,6 @@
-﻿using EventManager.Areas.Identity.Data;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EventManager.Models.Domain
 {
@@ -14,7 +10,10 @@ namespace EventManager.Models.Domain
         public int RegistrationId { get; set; }
         public DateTime TimeStamp { get; set; }
         public string UserId { get; set; }
-        public virtual EventManagerUser User { get; set; }
+        public string UserDisplayName { get; set; }
+        public string UserPhoneNumber { get; set; }
+        public string UserEmail { get; set; }
+        public virtual User User { get; set; }
         public int EventId { get; set; }
         public virtual Event Event { get; set; }
         public RegistrationStatus Status { get; set; }

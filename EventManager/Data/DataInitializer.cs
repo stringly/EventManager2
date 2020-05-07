@@ -1,9 +1,6 @@
 ﻿using EventManager.Models.Domain;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
-using System.Threading.Tasks;
 
 namespace EventManager.Data
 {
@@ -13,6 +10,8 @@ namespace EventManager.Data
         public static void SeedData(ApplicationDbContext context)
         {
             SeedUserRanks(context);
+            SeedAdminUser(context);
+            SeedEventTypes(context);
             context.SaveChangesAsync();
         }
         public static void SeedUserRanks(ApplicationDbContext context)
@@ -38,6 +37,35 @@ namespace EventManager.Data
                     new Rank("A/DC", "Acting Deputy Chief")
                 };
                 context.Ranks.AddRangeAsync(ranks);
+            }
+        }
+        public static void SeedAdminUser(ApplicationDbContext context)
+        {
+            if (!context.Users.Any())
+            {
+                User user = new User()
+                {
+                    FirstName = "Jason",
+                    LastName = "Smith",
+                    BlueDeckId = 1,
+                    Email = "jcsmith1@co.pg.md.us",
+                    Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault()
+                };
+            }
+        }
+
+        public static void SeedEventTypes(ApplicationDbContext context)
+        {
+            if (!context.EventTypes.Any())
+            {
+                List<EventType> eventTypes = new List<EventType>()
+                {
+                    new EventType() { EventTypeName = "Training"},
+                    new EventType() { EventTypeName = "Overtime"},
+                    new EventType() { EventTypeName = "Special Assignment"},
+                    new EventType() { EventTypeName = "Meeting"}
+                };
+                context.EventTypes.AddRangeAsync(eventTypes);
             }
         }
     }
