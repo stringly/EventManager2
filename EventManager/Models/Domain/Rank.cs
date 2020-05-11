@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EventManager.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace EventManager.Models.Domain
 {
-    public class Rank
+    public class Rank : IEntity
     {
         [Key]
-        public int RankId { get; set; }
-        private string Short { get; set; }
-        private string Full { get; set; }
+        public int Id { get; set; }
+        public string Short { get; set; }
+        public string Full { get; set; }
         [NotMapped]
         public string FullName { get {
                 if (!String.IsNullOrEmpty(this.Full))

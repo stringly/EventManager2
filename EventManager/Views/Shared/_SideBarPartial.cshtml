@@ -1,0 +1,71 @@
+﻿@using System.Security.Claims;
+
+@{
+    var DisplayName = ((ClaimsIdentity)User.Identity).FindFirst("DisplayName").Value;
+    var UserId = ((ClaimsIdentity)User.Identity).FindFirst("UserId").Value;
+    var givenName = ((ClaimsIdentity)User.Identity).FindFirst("GivenName").Value;
+}
+
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <img src="~/Images/badgesideways.png" class="pr-1" style="float:left" width="45" height="45" />
+        <h5 class="mb-0" >Event Hub</h5>
+        <small>PGPD Event Manager</small>
+    </div>
+
+    <ul class="list-unstyled components">
+        <p style="border-top: 1px solid var(--sunshine)">
+            Welcome, @givenName
+        </p>       
+        <li class="@(ViewData["ActiveMenu"].ToString() == "Home" ? "active" : "")">
+            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="@(ViewData["ActiveMenu"].ToString() == "Home" ? "true" : "false")" class="@(ViewData["ActiveMenu"].ToString() == "Home" ? "dropdown-toggle" : "dropdown-toggle collapsed")">Home</a>
+            <ul class="@(ViewData["ActiveMenu"].ToString() == "Home" ? "collapse list-unstyled show" : "collapse list-unstyled")" id="homeSubmenu">
+                <li class="@(ViewData["ActiveLink"].ToString() == "Home" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li>
+                    <a asp-action="Registrations" asp-controller="Home">My Registrations</a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="Event">View Events</a>
+                </li>
+            </ul>
+        </li>
+        <li class="@(ViewData["ActiveMenu"].ToString() == "Admin" ? "active" : "")">
+            <a href="#adminSubmenu" data-toggle="collapse" aria-expanded="@(ViewData["ActiveMenu"].ToString() == "Admin" ? "true" : "false")" class="@(ViewData["ActiveMenu"].ToString() == "Admin" ? "dropdown-toggle" : "dropdown-toggle collapsed")">Admin</a>
+            <ul class="@(ViewData["ActiveMenu"].ToString() == "Admin" ? "collapse list-unstyled show" : "collapse list-unstyled")" id="adminSubmenu">
+                <li class="@(ViewData["ActiveLink"].ToString() == "EventIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Event">Event Index</a>
+                </li>
+                <li class="@(ViewData["ActiveLink"].ToString() == "EventSeriesIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="EventSeries">Event Series Index</a>
+                </li>
+                <li class="@(ViewData["ActiveLink"].ToString() == "EventTypeIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="EventType">Event Type Index</a>
+                </li>
+                <li class="@(ViewData["ActiveLink"].ToString() == "RegistrationIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Registration">Registration Index</a>
+                </li>
+                <li class="@(ViewData["ActiveLink"].ToString() == "UserIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="User">User Index</a>
+                </li>
+                <li class="@(ViewData["ActiveLink"].ToString() == "RankIndex" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Rank">Rank Index</a>
+                </li>
+            </ul>
+        </li>
+        <li class="@(ViewData["ActiveMenu"].ToString() == "About" ? "active" : "")">
+            <a asp-action="About" asp-controller="Home">About</a>
+        </li>
+    </ul>
+
+    <ul class="list-unstyled CTAs">
+        <li>
+            <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a>
+        </li>
+        <li>
+            <a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a>
+        </li>
+    </ul>
+</nav>
+

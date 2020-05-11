@@ -13,8 +13,8 @@ namespace EventManager.Services
 {
     public class ClaimsLoader : IClaimsTransformation
     {
-        private readonly ApplicationDbContext _context;
-        public ClaimsLoader(ApplicationDbContext context)
+        private readonly EventManagerContext _context;
+        public ClaimsLoader(EventManagerContext context)
         {
             _context = context;
         }
@@ -27,7 +27,9 @@ namespace EventManager.Services
             if(principal.Identity is ClaimsIdentity)
             {
                 string logonName = user.Split('\\')[1];
-                User dbUser = await _context.Users.FirstOrDefaultAsync(x => x.LDAPName == logonName);
+                User dbUser = await _context.Users
+                    .Include(x => x.Rank)
+                    .FirstOrDefaultAsync(x => x.LDAPName == logonName);
                 if (dbUser != null)
                 {
                     var ci = (ClaimsIdentity)principal.Identity;
@@ -53,7 +55,9 @@ namespace EventManager.Services
                     //}
                     ci.AddClaim(new Claim(ClaimTypes.GivenName, dbUser.FirstName));
                     ci.AddClaim(new Claim(ClaimTypes.Surname, dbUser.LastName));
-                    ci.AddClaim(new Claim("UserId", dbUser.UserId.ToString(), ClaimValueTypes.Integer32));
+                    ci.AddClaim(new Claim("UserId", dbUser.Id.ToString(), ClaimValueTypes.Integer32));
+                    ci.AddClaim(new Claim("GivenName", dbUser.FirstName));
+                    ci.AddClaim(new Claim("DisplayNameShort", $"{dbUser.Rank.ShortName} {dbUser.LastName}"));
                     ci.AddClaim(new Claim("DisplayName", dbUser.DisplayName));
                     ci.AddClaim(new Claim("LDAPName", dbUser.LDAPName));
                 }
@@ -62,6 +66,8 @@ namespace EventManager.Services
                     var ci = (ClaimsIdentity)principal.Identity;
                     ci.AddClaim(new Claim("DisplayName", "Guest"));
                     ci.AddClaim(new Claim("UserId", "0", ClaimValueTypes.Integer32));
+                    ci.AddClaim(new Claim("GivenName", "Guest"));
+                    ci.AddClaim(new Claim("DisplayNameShort", "Guest"));
                     //ci.AddClaim(new Claim(ci.RoleClaimType, "Guest"));
                     ci.AddClaim(new Claim("LDAPName", logonName));
                 }

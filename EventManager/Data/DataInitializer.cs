@@ -7,14 +7,15 @@ namespace EventManager.Data
     public static class DataInitializer
     {
         
-        public static void SeedData(ApplicationDbContext context)
+        public static void SeedData(EventManagerContext context)
         {
             SeedUserRanks(context);
+            context.SaveChanges();
             SeedAdminUser(context);
             SeedEventTypes(context);
             context.SaveChangesAsync();
         }
-        public static void SeedUserRanks(ApplicationDbContext context)
+        public static void SeedUserRanks(EventManagerContext context)
         {
             if (!context.Ranks.Any())
             {
@@ -39,22 +40,39 @@ namespace EventManager.Data
                 context.Ranks.AddRangeAsync(ranks);
             }
         }
-        public static void SeedAdminUser(ApplicationDbContext context)
+        public static void SeedAdminUser(EventManagerContext context)
         {
             if (!context.Users.Any())
             {
-                User user = new User()
+                List<User> admins = new List<User>()
                 {
-                    FirstName = "Jason",
-                    LastName = "Smith",
-                    BlueDeckId = 1,
-                    Email = "jcsmith1@co.pg.md.us",
-                    Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault()
+                    new User()
+                    {
+                        FirstName = "Jason",
+                        LastName = "Smith",
+                        BlueDeckId = 1,
+                        IdNumber = "3134",
+                        Email = "jcsmith1@co.pg.md.us",
+                        Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault(),
+                        LDAPName = "jcsmith1"
+                    },
+                    new User()
+                    {
+                        FirstName = "Jason",
+                        LastName = "Smith",
+                        BlueDeckId = 1,
+                        IdNumber = "3134",
+                        Email = "jcs3082@hotmail.com",
+                        Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault(),
+                        LDAPName = "jcs30"
+                    }
                 };
+                context.Users.AddRange(admins);
+                
             }
         }
 
-        public static void SeedEventTypes(ApplicationDbContext context)
+        public static void SeedEventTypes(EventManagerContext context)
         {
             if (!context.EventTypes.Any())
             {

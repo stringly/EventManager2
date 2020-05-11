@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using EventManager.Data;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace EventManager.Models.Domain
 {
-    public class EventSeries
+    public class EventSeries : IEntity
     {
         [Key]
-        public int EventSeriesId { get; set; }
+        public int Id { get; set; }
         public string Title { get;set;}
         public string Description { get; set;}
         public virtual ICollection<Event> Events { get; set; }

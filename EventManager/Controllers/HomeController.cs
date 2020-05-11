@@ -18,19 +18,21 @@ namespace EventManager.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : Controller
     {
-        private ApplicationDbContext _context;
+        private EventManagerContext _context;
         public IActionResult Index()
         {
             var identity = (ClaimsIdentity)User.Identity;
             if(identity.HasClaim(claim => claim.Type == "UserId"))
             {
-                var claimMemberId = Convert.ToInt32(identity.Claims.FirstOrDefault(claim => claim.Type == "MemberId").Value.ToString());
+                var claimMemberId = Convert.ToInt32(identity.Claims?.FirstOrDefault(claim => claim.Type == "UserId")?.Value.ToString() ?? "0");
                 if(claimMemberId == 0) // memberId 0 means the user is not in the user table.
-                {
+                {                    
                     return RedirectToAction(nameof(About));
                 }
                 else
                 {
+                    ViewData["ActiveMenu"] = "Home";
+                    ViewData["ActiveLink"] = "Home";
                     return View();
                 }
             }
@@ -40,11 +42,15 @@ namespace EventManager.Controllers
 
         public IActionResult Privacy()
         {
+            ViewData["ActiveMenu"] = "Privacy";
+            ViewData["ActiveLink"] = "Privacy";
             return View();
         }
 
         public IActionResult About()
         {
+            ViewData["ActiveMenu"] = "About";
+            ViewData["ActiveLink"] = "About";
             return View();
         }
 

@@ -1,0 +1,148 @@
+﻿@model EventSeriesIndexViewModel
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="mb-2 pageHeaderTitle">
+            <h3>Event Series Index</h3>
+        </div>
+        <hr />
+        <div class="mb-2"><a asp-action="Create" asp-controller="EventSeries" asp-route-returnUrl="/EventSeries/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")"><i class="fas fa-plus"></i> Create New Event Series</a></div>
+        <form asp-page="/Index" method="get" class="floatingForm">
+            <div class="form-row align-items-center mb-2">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <input type="text" name="SearchString" class="form-control form-control-sm" value="@Model.CurrentFilter" placeholder="Search Event Series" />
+                </div>
+            </div>
+            <div class="form-row align-items-top">
+                @*<div class="col-auto mb-2">
+                    <select asp-for="SelectedUserId" class="form-control form-control-sm" asp-items="Model.Users">
+                        <option value="">No User Filter</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                    <select asp-for="SelectedEventTypeId" class="form-control form-control-sm" asp-items="Model.EventTypes">
+                        <option value="0">No Event Type Filter</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                        <div class="form-row">
+                            <div class="col-auto mb-2">
+                                <input type="text" asp-for="StartDate" class="form-control form-control-sm" placeholder="Start Date" />
+                            </div>
+                            <div class="col-auto mb-2">
+                                <input type="text" asp-for="EndDate" class="form-control form-control-sm" placeholder="End Date" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-12 mb-2 text-right">
+                                <small class="text-muted">Set Dates to Pay Period: </small>
+                                <button type="button" class="btn btn-sm btn-success" id="currentPayPeriodButton" data-startdate="@Model.PayPeriodStartDate" data-enddate="@Model.PayPeriodEndDate">Current</button>
+                                <button type="button" class="btn btn-sm btn-success" id="previousPayPeriodButton" data-startdate="@Model.PreviousPayPeriodStartDate" data-enddate="@Model.PreviousPayPeriodEndDate">Previous</button>
+                            </div>
+                        </div>
+                    </div>*@
+                <div class="col-auto mb-2">
+                    <button type="submit" class="btn btn-sm btn-default" id="filterSubmit"><i class="fas fa-search"></i> Search</button>
+                    @*@if (!String.IsNullOrEmpty(Model.CurrentFilter) || (Model.StartDate != null && Model.EndDate != null) || !String.IsNullOrEmpty(Model.UserId) || Model.WorksiteId != 0)*@
+                    @if (!String.IsNullOrEmpty(Model.CurrentFilter))
+                    {
+                        <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="EventSeries"><i class="fas fa-arrow-left"></i> Back to Full List</a>
+                    }
+                </div>
+            </div>
+
+        </form>
+        <div class="table-responsive-sm">
+            <table class="table table-striped table-sm table-light indexTable">
+                <thead>
+                    <tr class="tablePageControlHeaderRow">
+                        <th colspan="4">
+                            <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+                                 page-class="" page-class-normal=""
+                                 page-class-selected="active"
+                                 page-url-searchString="@Model.CurrentFilter"
+                                 page-url-sortOrder="@Model.CurrentSort"
+                                 class="btn-group">
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Event Series Id"
+                               asp-route-sortOrder="@Model.EventSeriesIdSort"
+                               asp-route-searchString="@Model.CurrentFilter">
+                                EventSeriesId
+                                @if (Model.CurrentSort == "eventSeriesId_desc")
+                                {
+                                    <i class="fas fa-sort-numeric-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-numeric-down"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Title"
+                               asp-route-sortOrder="@Model.TitleSort"
+                               asp-route-searchString="@Model.CurrentFilter">
+                                Series Title
+                                @if (Model.CurrentSort == "eventTitle_desc")
+                                {
+                                    <i class="fas fa-sort-alpha-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-alpha-up-alt"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            Number of Events
+                        </th>
+                        
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.EventSeriesItems.Count() > 0)
+                    {
+                        foreach (EventSeriesIndexViewModelEventSeriesItem e in Model.EventSeriesItems)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Event">@e.EventSeriesId</a>
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="EventSeries">@e.EventSeriesTitle</a>
+                                </td>
+                                <td>
+                                    @e.EventSeriesEventCount
+                                </td>
+                                <td class="text-right">
+                                    <a asp-action="Details" asp-route-id="@e.EventSeriesId" asp-route-returnUrl="/EventSeries/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@e.EventSeriesId" asp-route-returnUrl="/EventSeries/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Edit Event" class="glyphicon-ring">
+                                        <i class="fas fa-pen-square"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@e.EventSeriesId" asp-route-returnUrl="/EventSeries/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Delete Event" class="glyphicon-ring">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No matching Event Series were found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

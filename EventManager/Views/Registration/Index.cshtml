@@ -1,0 +1,191 @@
+﻿@model RegistrationIndexViewModel
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="mb-2 pageHeaderTitle">
+            <h3>Registration Index</h3>
+        </div>
+        <hr />
+        <div class="mb-2"><a asp-action="Create" asp-controller="Registration" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")"><i class="fas fa-plus"></i> Create New Registration</a></div>
+        <form asp-page="/Index" method="get" class="floatingForm">
+            <div class="form-row align-items-center mb-2">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <input type="text" name="SearchString" class="form-control form-control-sm" value="@Model.CurrentFilter" placeholder="Search Registrations" />
+                </div>
+            </div>
+            <div class="form-row align-items-top">
+                <div class="col-auto mb-2">
+                    <select asp-for="SelectedEventId" class="form-control form-control-sm" asp-items="Model.Events">
+                        <option value="">No Event Filter</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                    <select asp-for="SelectedUserId" class="form-control form-control-sm" asp-items="Model.Users">
+                        <option value="">No User Filter</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                    <select asp-for="SelectedEventTypeId" class="form-control form-control-sm" asp-items="Model.EventTypes">
+                        <option value="0">No Event Type Filter</option>
+                    </select>
+                </div>
+                <div class="col-auto mb-2">
+                    <button type="submit" class="btn btn-sm btn-default" id="filterSubmit"><i class="fas fa-search"></i> Search</button>                    
+                    @if (!String.IsNullOrEmpty(Model.CurrentFilter) || Model.SelectedEventId != 0 || Model.SelectedUserId != 0 || Model.SelectedEventTypeId != 0)
+                    {
+                        <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="Registration"><i class="fas fa-arrow-left"></i> Back to Full List</a>
+                    }
+                </div>
+            </div>
+
+        </form>
+        <div class="table-responsive-sm">
+            <table class="table table-striped table-sm table-light indexTable">
+                <thead>
+                    <tr class="tablePageControlHeaderRow">
+                        <th colspan="6">
+                            <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+                                 page-class="" page-class-normal=""
+                                 page-class-selected="active"
+                                 page-url-searchString="@Model.CurrentFilter"
+                                 page-url-sortOrder="@Model.CurrentSort"
+                                 page-url-EventId="@Model.SelectedEventId"
+                                 page-url-UserId="@Model.SelectedUserId"
+                                 page-url-EventTypeId="@Model.SelectedEventTypeId"
+                                 class="btn-group">
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            RegistrationId
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Registration Date"
+                               asp-route-sortOrder="@Model.RegistrationDateSort"
+                               asp-route-searchString="@Model.CurrentFilter"
+                               asp-route-EventId="@Model.SelectedEventId"
+                               asp-route-UserId="@Model.SelectedUserId"
+                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
+                                Registration Date
+                                @if (Model.CurrentSort == "registrationDate_desc")
+                                {
+                                    <i class="fas fa-sort-numeric-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-numeric-down"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by User"
+                               asp-route-sortOrder="@Model.UserIdSort"
+                               asp-route-searchString="@Model.CurrentFilter"
+                               asp-route-EventId="@Model.SelectedEventId"
+                               asp-route-UserId="@Model.SelectedUserId"
+                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
+                                User
+                                @if (Model.CurrentSort == "eventSeries_desc")
+                                {
+                                    <i class="fas fa-sort-alpha-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-alpha-up-alt"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Event"
+                               asp-route-sortOrder="@Model.EventIdSort"
+                               asp-route-searchString="@Model.CurrentFilter"
+                               asp-route-EventId="@Model.SelectedEventId"
+                               asp-route-UserId="@Model.SelectedUserId"
+                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
+                                Event Title
+                                @if (Model.CurrentSort == "eventId_desc")
+                                {
+                                    <i class="fas fa-sort-numeric-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-numeric-down"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            Event Date
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Event Type"
+                               asp-route-sortOrder="@Model.EventTypeSort"
+                               asp-route-searchString="@Model.CurrentFilter"
+                               asp-route-EventId="@Model.SelectedEventId"
+                               asp-route-UserId="@Model.SelectedUserId"
+                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
+                                Event Type
+                                @if (Model.CurrentSort == "eventTypeId_desc")
+                                {
+                                    <i class="fas fa-sort-numeric-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-numeric-down"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Registrations.Count() > 0)
+                    {
+                        foreach (RegistrationIndexViewModelRegistrationItem r in Model.Registrations)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Registration" asp-route-id="@r.RegistrationId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@r.RegistrationId</a>
+                                </td>
+                                <td>
+                                    @r.RegistrationDate
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="User" asp-route-id="@r.UserId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@r.UserName</a>
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Event" asp-route-id="@r.EventId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@r.EventTitle</a>
+                                </td>
+                                <td>
+                                    @r.EventDate
+                                </td>
+                                <td>
+                                    @r.EventTypeName
+                                </td>
+                                <td class="text-right">
+                                    <a asp-action="Details" asp-route-id="@r.RegistrationId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@r.RegistrationId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Edit Registration" class="glyphicon-ring">
+                                        <i class="fas fa-pen-square"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@r.RegistrationId" asp-route-returnUrl="/Registration/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Delete Registration" class="glyphicon-ring">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center">No matching Registrations were found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

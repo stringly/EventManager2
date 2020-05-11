@@ -1,0 +1,119 @@
+﻿@model RankIndexViewModel
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="mb-2 pageHeaderTitle">
+            <h3>Rank Index</h3>
+        </div>
+        <hr />
+        <div class="mb-2"><a asp-action="Create" asp-controller="Rank" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")"><i class="fas fa-plus"></i> Create New Rank</a></div>
+        <form asp-page="/Index" method="get" class="floatingForm">
+            <div class="form-row align-items-center mb-2">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <input type="text" name="SearchString" class="form-control form-control-sm" value="@Model.CurrentFilter" placeholder="Search Ranks" />
+                </div>
+            </div>
+            <div class="form-row align-items-top">
+                <div class="col-auto mb-2">
+                    <button type="submit" class="btn btn-sm btn-default" id="filterSubmit"><i class="fas fa-search"></i> Search</button>
+                    @if (!String.IsNullOrEmpty(Model.CurrentFilter))
+                    {
+                        <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="Rank"><i class="fas fa-arrow-left"></i> Back to Full List</a>
+                    }
+                </div>
+            </div>
+
+        </form>
+        <div class="table-responsive-sm">
+            <table class="table table-striped table-sm table-light indexTable">
+                <thead>
+                    <tr class="tablePageControlHeaderRow">
+                        <th colspan="4">
+                            <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+                                 page-class="" page-class-normal=""
+                                 page-class-selected="active"
+                                 page-url-searchString="@Model.CurrentFilter"
+                                 page-url-sortOrder="@Model.CurrentSort"
+                                 class="btn-group">
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Rank Id"
+                               asp-route-sortOrder="@Model.RankIdSort"
+                               asp-route-searchString="@Model.CurrentFilter">
+                                Rank Id
+                                @if (Model.CurrentSort == "rankId_desc")
+                                {
+                                    <i class="fas fa-sort-numeric-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-numeric-down"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Index" title="Sort by Rank Name"
+                               asp-route-sortOrder="@Model.RankNameSort"
+                               asp-route-searchString="@Model.CurrentFilter">
+                                Type Name
+                                @if (Model.CurrentSort == "rankName_desc")
+                                {
+                                    <i class="fas fa-sort-alpha-up"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort-alpha-up-alt"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            Abbreviation
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Ranks.Count() > 0)
+                    {
+                        foreach (RankIndexViewModelRankItem r in Model.Ranks)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Rank">@r.RankId</a>
+                                </td>
+                                <td>
+                                    @r.RankFullName
+                                </td>
+                                <td>
+                                    @r.Abbreviation
+                                </td>
+                                <td class="text-right">
+                                    <a asp-action="Details" asp-route-id="@r.RankId" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@r.RankId" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Edit Rank" class="glyphicon-ring">
+                                        <i class="fas fa-pen-square"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@r.RankId" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Delete Rank" class="glyphicon-ring">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">No matching Ranks were found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

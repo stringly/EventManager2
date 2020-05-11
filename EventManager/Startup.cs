@@ -1,4 +1,6 @@
 ﻿using EventManager.Data;
+using EventManager.Data.Core;
+using EventManager.Data.Persistence;
 using EventManager.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -13,9 +15,11 @@ namespace EventManager
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            Configuration = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json").Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -30,17 +34,22 @@ namespace EventManager
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<EventManagerContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAuthentication(Microsoft.AspNetCore.Server.IISIntegration.IISDefaults.AuthenticationScheme);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IClaimsTransformation, ClaimsLoader>();
+            // Register repositories
+
+            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context, IConfiguration config)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, EventManagerContext context, IConfiguration config)
         {
             if (env.IsDevelopment())
             {
@@ -55,10 +64,9 @@ namespace EventManager
             }
             DataInitializer.SeedData(context);
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
-            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
