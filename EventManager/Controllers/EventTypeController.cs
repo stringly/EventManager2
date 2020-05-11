@@ -34,7 +34,7 @@ namespace EventManager.Controllers
             vm.TypeNameSortOrder = String.IsNullOrEmpty(sortOrder) ? "eventTypeName_desc" : "";
             vm.TypeEventCountSortOrder = sortOrder == "EventCount" ? "eventCount_desc" : "EventCount";
 
-            IEnumerable<EventType> eventTypes = await unitOfWork.EventTypes.GetAll();
+            IEnumerable<EventType> eventTypes = await unitOfWork.EventTypes.GetAllAsync();
             switch (sortOrder)
             {
                 case "eventTypeName_desc":

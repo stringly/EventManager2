@@ -49,14 +49,14 @@ namespace EventManager.Models.ViewModels
         public string IdNumber { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public int BlueDeckId { get;set;}
+        public uint BlueDeckId { get;set;}
         public UserIndexViewModelUserItem(User u)
         {
             UserId = u.Id;
             LDAPName = u.LDAPName;
             Rank = u?.Rank?.Short ?? "-";
-            LastName = u.LastName;
-            FirstName = u.FirstName;
+            LastName = u.NameFactory.Last;
+            FirstName = u.NameFactory.First;
             IdNumber = u.IdNumber;
             Email = u.Email;
             Phone = u.ContactNumber;

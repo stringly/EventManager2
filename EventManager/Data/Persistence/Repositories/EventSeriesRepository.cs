@@ -20,7 +20,7 @@ namespace EventManager.Data.Persistence.Repositories
 
         public async Task<IEnumerable<EventSeries>> GetEventSeriesWithEventsAsync(int filterByEventSeriesId = 0)
         {
-            return await EventManagerContext.EventSeries
+            return await EventManagerContext.EventSerieses
                 .Where(x => (filterByEventSeriesId == 0 || x.Id == filterByEventSeriesId))
                 .Include(x => x.Events)
                     .ThenInclude(x => x.EventType)

@@ -169,8 +169,7 @@ namespace EventManager.Controllers
                 string lowerString = new string(arr);
                 lowerString = lowerString.ToLower();
                 registrations = registrations
-                    .Where(x => x.User.FirstName.ToLower().Contains(lowerString)
-                        || x.User.LastName.ToLower().Contains(lowerString)
+                    .Where(x => x.User.Name.ToLower().Contains(lowerString)
                         || x.User.Email.ToLower().Contains(lowerString)
                         || x.Event.Title.ToLower().Contains(lowerString))
                     .ToList();

@@ -51,10 +51,10 @@ namespace EventManager.Controllers
                     users = users.OrderByDescending(x => x.RankId).ToList();
                     break;
                 case "lastName_desc":
-                    users = users.OrderByDescending(x => x.LastName).ToList();
+                    users = users.OrderByDescending(x => x.NameFactory.Last).ToList();
                     break;
                 default:
-                    users = users.OrderBy(x => x.LastName).ToList();
+                    users = users.OrderBy(x => x.NameFactory.First).ToList();
                     break;
             }
             if (!string.IsNullOrEmpty(searchString))
@@ -66,8 +66,7 @@ namespace EventManager.Controllers
                 string lowerString = new string(arr);
                 lowerString = lowerString.ToLower();
                 users = users
-                    .Where(x => x.FirstName.ToLower().Contains(lowerString)
-                        || x.LastName.ToLower().Contains(lowerString)
+                    .Where(x => x.Name.ToLower().Contains(lowerString)                        
                         || x.Email.ToLower().Contains(lowerString)
                         || x.IdNumber.ToLower().Contains(lowerString))
                     .ToList();

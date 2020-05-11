@@ -1,4 +1,7 @@
-﻿using EventManager.Models.Domain;
+﻿using EventManager.Data.Core;
+using EventManager.Data.Core.Repositories;
+using EventManager.Data.Persistence;
+using EventManager.Models.Domain;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,18 +9,20 @@ namespace EventManager.Data
 {
     public static class DataInitializer
     {
-        
-        public static void SeedData(EventManagerContext context)
+        private static IUnitOfWork _unitOfWork;
+        public static void SeedData(IUnitOfWork unitOfWork)
         {
-            SeedUserRanks(context);
-            context.SaveChanges();
-            SeedAdminUser(context);
-            SeedEventTypes(context);
-            context.SaveChangesAsync();
+            _unitOfWork = unitOfWork;
+            SeedUserRanks();
+            unitOfWork.Complete();
+            SeedAdminUser();
+            SeedEventTypes();
+            unitOfWork.Complete();
         }
-        public static void SeedUserRanks(EventManagerContext context)
+        public static void SeedUserRanks()
         {
-            if (!context.Ranks.Any())
+            bool ranksPresent = _unitOfWork.Ranks.Any();
+            if (!ranksPresent)
             {
                 List<Rank> ranks = new List<Rank>()
                 {
@@ -37,53 +42,42 @@ namespace EventManager.Data
                     new Rank("A/Maj.", "Acting Major"),
                     new Rank("A/DC", "Acting Deputy Chief")
                 };
-                context.Ranks.AddRangeAsync(ranks);
+                _unitOfWork.Ranks.AddRange(ranks);
             }
         }
-        public static void SeedAdminUser(EventManagerContext context)
+        public static void SeedAdminUser()
         {
-            if (!context.Users.Any())
+            bool usersPresent = _unitOfWork.Users.Any();
+            if (!usersPresent)
             {
-                List<User> admins = new List<User>()
+                Rank adminUserRank = _unitOfWork.Ranks.GetRankByFullName("Lieutenant");
+                if (adminUserRank == null)
                 {
-                    new User()
-                    {
-                        FirstName = "Jason",
-                        LastName = "Smith",
-                        BlueDeckId = 1,
-                        IdNumber = "3134",
-                        Email = "jcsmith1@co.pg.md.us",
-                        Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault(),
-                        LDAPName = "jcsmith1"
-                    },
-                    new User()
-                    {
-                        FirstName = "Jason",
-                        LastName = "Smith",
-                        BlueDeckId = 1,
-                        IdNumber = "3134",
-                        Email = "jcs3082@hotmail.com",
-                        Rank = context.Ranks.Where(x => x.FullName == "Lieutenant").FirstOrDefault(),
-                        LDAPName = "jcs30"
-                    }
+                    throw new KeyNotFoundException("Admin rank Lieutenant does not match any rank in the context.");
+                }
+                List<User> admins = new List<User>()
+                {                    
+                    new User("jcsmith1", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank),                 
+                    new User("jcsmith1", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank)
+
                 };
-                context.Users.AddRange(admins);
-                
+                _unitOfWork.Users.AddRange(admins);
             }
         }
 
-        public static void SeedEventTypes(EventManagerContext context)
+        public static void SeedEventTypes()
         {
-            if (!context.EventTypes.Any())
+            bool eventTypesPresent = _unitOfWork.EventTypes.Any();
+            if (!eventTypesPresent)
             {
                 List<EventType> eventTypes = new List<EventType>()
                 {
-                    new EventType() { EventTypeName = "Training"},
-                    new EventType() { EventTypeName = "Overtime"},
-                    new EventType() { EventTypeName = "Special Assignment"},
-                    new EventType() { EventTypeName = "Meeting"}
+                    new EventType("Training"),
+                    new EventType("Overtime"),
+                    new EventType("Special Assignment"),
+                    new EventType("Meeting") 
                 };
-                context.EventTypes.AddRangeAsync(eventTypes);
+                _unitOfWork.EventTypes.AddRange(eventTypes);
             }
         }
     }

@@ -30,7 +30,6 @@ namespace EventManager.Controllers
             EventIndexViewModel vm = new EventIndexViewModel(PageSize);
             vm.CurrentSort = sortOrder;
             vm.CurrentFilter = searchString;
-            vm.CreatedDateSort = String.IsNullOrEmpty(sortOrder) ? "createdDate_desc" : "";
             vm.StartDateSort = sortOrder == "StartDate" ? "startDate_desc" : "StartDate";
             vm.UserIdSort = sortOrder == "UserId" ? "userId_desc" : "UserId";
             vm.EventTypeSort = sortOrder == "EventType" ? "eventType_desc" : "EventType";
@@ -89,7 +88,7 @@ namespace EventManager.Controllers
             switch (sortOrder)
             {
                 case "createdDate_desc":
-                    events = events.OrderBy(x => x.CreatedDate).ToList();
+                    events = events.OrderBy(x => x.Id).ToList();
                     break;
                 case "StartDate":
                     events = events.OrderBy(x => x.StartDate).ToList();
@@ -98,10 +97,10 @@ namespace EventManager.Controllers
                     events = events.OrderByDescending(x => x.StartDate).ToList();
                     break;
                 case "UserId":
-                    events = events.OrderBy(x => x.CreatorId).ToList();
+                    events = events.OrderBy(x => x.OwnerId).ToList();
                     break;
                 case "userId_desc":
-                    events = events.OrderByDescending(x => x.CreatorId).ToList();
+                    events = events.OrderByDescending(x => x.OwnerId).ToList();
                     break;
                 case "EventType":
                     events = events.OrderBy(x => x.EventTypeId).ToList();
@@ -116,7 +115,7 @@ namespace EventManager.Controllers
                     events = events.OrderByDescending(x => x.EventSeriesId).ToList();
                     break;
                 default: 
-                    events = events.OrderByDescending(x => x.CreatedDate).ToList();
+                    events = events.OrderByDescending(x => x.Id).ToList();
                     break;
             }
 
@@ -131,8 +130,8 @@ namespace EventManager.Controllers
                 events = events
                     .Where(x => x.Title.ToLower().Contains(lowerString)
                         || x.EventSeries.Title.ToLower().Contains(lowerString)
-                        || x.Creator.DisplayName.ToLower().Contains(lowerString)
-                        || x.Creator.Email.ToLower().Contains(lowerString))
+                        || x.Owner.DisplayName.ToLower().Contains(lowerString)
+                        || x.Owner.Email.ToLower().Contains(lowerString))
                     .ToList();
             }
             vm.InitializeEventList(events.ToList(), page);

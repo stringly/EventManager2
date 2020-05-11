@@ -34,7 +34,7 @@ namespace EventManager.Controllers
             vm.EventSeriesIdSort = String.IsNullOrEmpty(sortOrder) ? "eventSeriesId_desc" : "";
             vm.TitleSort = sortOrder == "EventTitle" ? "eventTitle_desc" : "EventTitle";
 
-            IEnumerable<EventSeries> eventSeries = await unitOfWork.EventSeries.GetAll();
+            IEnumerable<EventSeries> eventSeries = await unitOfWork.EventSeries.GetAllAsync();
             
             switch (sortOrder)
             {

@@ -53,11 +53,11 @@ namespace EventManager.Services
                     //        ci.AddClaim(f);
                     //    }
                     //}
-                    ci.AddClaim(new Claim(ClaimTypes.GivenName, dbUser.FirstName));
-                    ci.AddClaim(new Claim(ClaimTypes.Surname, dbUser.LastName));
+                    ci.AddClaim(new Claim(ClaimTypes.GivenName, dbUser.NameFactory.First));
+                    ci.AddClaim(new Claim(ClaimTypes.Surname, dbUser.NameFactory.Last));
                     ci.AddClaim(new Claim("UserId", dbUser.Id.ToString(), ClaimValueTypes.Integer32));
-                    ci.AddClaim(new Claim("GivenName", dbUser.FirstName));
-                    ci.AddClaim(new Claim("DisplayNameShort", $"{dbUser.Rank.ShortName} {dbUser.LastName}"));
+                    ci.AddClaim(new Claim("GivenName", dbUser.NameFactory.First));
+                    ci.AddClaim(new Claim("DisplayNameShort", $"{dbUser.Rank.ShortName} {dbUser.NameFactory.Last}"));
                     ci.AddClaim(new Claim("DisplayName", dbUser.DisplayName));
                     ci.AddClaim(new Claim("LDAPName", dbUser.LDAPName));
                 }

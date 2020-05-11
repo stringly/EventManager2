@@ -117,6 +117,7 @@ namespace EventManager.Models.Domain
             }
             
             _fundCenter = fundCenter;
+            _registrations = new List<Registration>();
      
         }
         /// <summary>
@@ -367,35 +368,7 @@ namespace EventManager.Models.Domain
             {
                 EventType = type;
             }
-        }
-        public void AddEventToSeries(EventSeries series)
-        {
-            if(series == null)
-            {
-                throw new ArgumentException("Event Series cannot be null.", nameof(series));
-            }
-            else
-            {
-                EventSeries = series;
-            }
-        }
-        public void RemoveFromSeries()
-        {
-            EventSeries = null;
-            EventSeriesId = null;
-        }
-        public void UpdateOwner(User newOwner)
-        {
-            if(newOwner == null)
-            {
-                throw new ArgumentException("Owner cannot be null.", nameof(newOwner));
-            }
-            else
-            {
-                Owner = newOwner;
-                OwnerId = newOwner.Id;               
-            }
-        }
+        }                
         public bool IsAcceptingRegistrations()
         {
             // Return false if Event Start Date is in the past
@@ -435,6 +408,46 @@ namespace EventManager.Models.Domain
         public IEnumerable<Registration> GetRejectedRegistrations()
         {
             return Registrations?.Where(x => x.IsRejected).ToList() ?? new List<Registration>();
+        }
+        public bool AddRegistration(User u, Registration.RegistrationStatus status, out string response)
+        {
+            if (_registrations == null)
+            {
+                response = "You must first retrieve this Event's existing list of registrations";
+                return false;
+            }
+            var foundUserRegistration = _registrations.Where(x => x.UserId == u.Id).FirstOrDefault();
+            if (foundUserRegistration == null)
+            {
+                _registrations.Add(new Registration(u, this, status));
+                response = "Registration added to event.";
+                return true;
+            }
+            else
+            {
+                response = "User is already registered for this event";
+                return false;
+            }
+        }
+        public bool RemoveRegistration(User u, out string response)
+        {
+            if (_registrations == null)
+            {
+                response = "You must first retrieve this Event's existing list of registrations";
+                return false;
+            }
+            var foundUserRegistration = _registrations.Where(x => x.UserId == u.Id).FirstOrDefault();
+            if (foundUserRegistration == null)
+            {
+                _registrations.Remove(foundUserRegistration);
+                response = "Registration removed from event.";
+                return true;
+            }
+            else
+            {
+                response = "User is not registered for this event";
+                return false;
+            }
         }
     }
 }

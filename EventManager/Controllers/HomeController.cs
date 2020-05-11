@@ -17,8 +17,7 @@ namespace EventManager.Controllers
     [Authorize]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : Controller
-    {
-        private EventManagerContext _context;
+    {        
         public IActionResult Index()
         {
             var identity = (ClaimsIdentity)User.Identity;

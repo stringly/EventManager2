@@ -1,45 +1,48 @@
-﻿using EventManager.Data;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
 
 namespace EventManager.Models.Domain
 {
-    public class Registration : IEntity
+    public class Registration
     {
-        [Key]
-        public int Id { get; set; }
-        public DateTime TimeStamp { get; set; }
-        public int? UserId { get; set; }
-        public string UserDisplayName { get; set; }
-        public string UserPhoneNumber { get; set; }
-        public string UserEmail { get; set; }
-        public virtual User User { get; set; }
-        public int EventId { get; set; }
-        public virtual Event Event { get; set; }
-        public RegistrationStatus Status { get; set; }
-
-        [NotMapped]
-        public bool IsActive { get {
-                return Status == RegistrationStatus.Accepted;
-            } 
-        }
-        [NotMapped]
-        public bool IsStandy { get {
-                return Status == RegistrationStatus.Standy;
-            } 
-        }
-        [NotMapped]
-        public bool IsPending { get {
-                return Status == RegistrationStatus.Pending;
+        private Registration() { }
+        public Registration(User u, Event e, RegistrationStatus status){
+            if (u == null)
+            {
+                throw new ArgumentNullException("User parameter cannot be null.", nameof(u));
+            }
+            else if (e == null)
+            {
+                throw new ArgumentNullException("Event parameter cannot be null", nameof(e));
+            }            
+            else
+            {
+                TimeStamp = DateTime.Now;
+                UserId = u.Id;
+                User = u;
+                Event = e;
+                EventId = e.Id;
+                Status = status;
             }
         }
-        [NotMapped]
-        public bool IsRejected { get {
-                return Status == RegistrationStatus.Rejected;
-            }
-        }
+        public int Id { get; private set; }
+        public DateTime TimeStamp { get; private set; }
+        public int? UserId { get; private set; }
+        public virtual User User { get; private set; }
+        public int EventId { get; private set; }
+        public virtual Event Event { get; private set; }
+        public RegistrationStatus Status { get; private set; }
+        public string UserDisplayName => User?.DisplayName ?? "-";
+        public string UserEmail => User?.Email ?? "-";
+        public string UserContactNumber => User?.ContactNumber ?? "-";
+        public bool IsActive => Status == RegistrationStatus.Accepted;        
+        public bool IsStandy => Status == RegistrationStatus.Standy;        
+        public bool IsPending => Status == RegistrationStatus.Pending;
+        public bool IsRejected => Status == RegistrationStatus.Rejected;                
 
+        public void UpdateStatus(RegistrationStatus newStatus)
+        {
+            Status = newStatus;
+        }
         public enum RegistrationStatus
         {
             Pending,

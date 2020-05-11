@@ -32,7 +32,7 @@ namespace EventManager.Controllers
             vm.CurrentFilter = searchString;
             vm.RankIdSort = String.IsNullOrEmpty(sortOrder) ? "rankId_desc" : "";
             vm.RankNameSort = sortOrder == "RankName" ? "rankName_desc" : "RankName";
-            IEnumerable<Rank> ranks = await unitOfWork.Ranks.GetAll();
+            IEnumerable<Rank> ranks = await unitOfWork.Ranks.GetAllAsync();
 
             switch (sortOrder)
             {

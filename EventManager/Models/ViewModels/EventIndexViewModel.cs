@@ -11,7 +11,6 @@ namespace EventManager.Models.ViewModels
     {
         public string UserIdSort { get; set; }
         public string EventTypeSort { get; set; }
-        public string CreatedDateSort { get; set; }
         public string StartDateSort { get; set; }
         public string EventSeriesSort { get; set; }
         public int SelectedUserId { get; set; }
@@ -36,7 +35,7 @@ namespace EventManager.Models.ViewModels
                 .ToList()
                 .ConvertAll(x => new EventIndexViewModelEventItem(x));
             
-            Users = events.Select(x => x.Creator).Distinct().ToList().ConvertAll(x => new SelectListItem { Text = x.DisplayName, Value = x.Id.ToString() });
+            Users = events.Select(x => x.Owner).Distinct().ToList().ConvertAll(x => new SelectListItem { Text = x.DisplayName, Value = x.Id.ToString() });
             EventTypes = events.Select(x => x.EventType).Distinct().ToList().ConvertAll(x => new SelectListItem { Text = x.EventTypeName, Value = x.Id.ToString()});
         }
 
@@ -45,7 +44,6 @@ namespace EventManager.Models.ViewModels
     public class EventIndexViewModelEventItem
     {
         public int EventId { get; set; }
-        public string CreatedDate { get; set;}
         public string StartDate { get; set; }
         public string EndDate { get; set; }
         public string EventTitle {get; set; }
@@ -57,16 +55,15 @@ namespace EventManager.Models.ViewModels
         public int CreatedByUserId { get; set; }
         public EventIndexViewModelEventItem(Event e)
         {
-            EventId = e.Id;
-            CreatedDate = e.CreatedDate.ToString("MM/dd/yy HH:mm");
+            EventId = e.Id;            
             StartDate = e.StartDate.ToString("MM/dd/yy HH:mm");
             EndDate = e.EndDate.ToString("MM/dd/yy HH:mm");
             EventTitle = e.Title;
             EventSeriesTitle = e?.EventSeries?.Title ?? "-";
-            CreatedByUserDisplayName = e?.Creator?.DisplayName ?? "-";
-            CreatedByUserEmail = e?.Creator?.Email ?? "-";
+            CreatedByUserDisplayName = e?.Owner?.DisplayName ?? "-";
+            CreatedByUserEmail = e?.Owner?.Email ?? "-";
             EventTypeName = e.EventTypeName;
-            CreatedByUserId = e?.Creator?.Id ?? 0;
+            CreatedByUserId = e?.Owner?.Id ?? 0;
         }
     }
 }

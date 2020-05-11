@@ -27,8 +27,8 @@ namespace EventManager.Data.Persistence.Repositories
         public async Task<IEnumerable<Event>> GetEventsWithCreatorEventTypeAndSeriesAsnyc(int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0)
         {
             return await EventManagerContext.Events
-                .Where(x => (filterByEventTypeId == 0 || x.EventTypeId == filterByEventTypeId) && (filterByCreatorUserId == 0 || x.CreatorId == filterByCreatorUserId) && (filterByEventSeriesId == 0 || x.EventSeriesId == filterByEventSeriesId) )
-                    .Include(x => x.Creator)
+                .Where(x => (filterByEventTypeId == 0 || x.EventTypeId == filterByEventTypeId) && (filterByCreatorUserId == 0 || x.OwnerId == filterByCreatorUserId) && (filterByEventSeriesId == 0 || x.EventSeriesId == filterByEventSeriesId) )
+                    .Include(x => x.Owner)
                         .ThenInclude(x => x.Rank)
                     .Include(x => x.EventType)
                     .Include(x => x.EventSeries)

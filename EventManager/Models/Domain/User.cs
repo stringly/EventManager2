@@ -30,6 +30,8 @@ namespace EventManager.Models.Domain
             {
                 NameFactory = PersonFullName.Create(firstName, lastName);
             }
+            _registrations = new List<Registration>();
+            _ownedEvents = new List<Event>();
             
         }
         
@@ -97,13 +99,36 @@ namespace EventManager.Models.Domain
         }
         public void UpdateRank(Rank newRank)
         {
-            if (Rank == null)
+            if (newRank == null)
             {
                 throw new ArgumentException("Rank cannot be null", nameof(newRank));
             }
             else
             {
                 Rank = newRank;
+            }
+        }
+
+        public void AddOwnedEvent(Event eventToAdd)
+        {
+            if (eventToAdd == null)
+            {
+                throw new ArgumentException("Event cannot be null", nameof(eventToAdd));
+            }
+            else
+            {
+                _ownedEvents.Add(eventToAdd);
+            }
+        }
+        public void RemoveOwnedEvent(Event eventToRemove)
+        {
+            if (eventToRemove == null)
+            {
+                throw new ArgumentException("Event cannot be null", nameof(eventToRemove));
+            }
+            else
+            {
+                _ownedEvents.Remove(eventToRemove);
             }
         }
     }

@@ -18,7 +18,7 @@ namespace EventManager.Models.ViewModels
         }
         public void InitializeEventTypeList(List<EventType> eventTypes, int page)
         {
-            PagingInfo.TotalItems = EventTypes.Count();
+            PagingInfo.TotalItems = eventTypes.Count();
             PagingInfo.CurrentPage = page;
             EventTypes = eventTypes
                 .Skip((PagingInfo.CurrentPage - 1) * PagingInfo.ItemsPerPage)

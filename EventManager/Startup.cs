@@ -55,6 +55,7 @@ namespace EventManager
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                DataInitializer.SeedData(new UnitOfWork(context));
             }
             else
             {
@@ -62,7 +63,7 @@ namespace EventManager
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            DataInitializer.SeedData(context);
+            
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseStaticFiles();
