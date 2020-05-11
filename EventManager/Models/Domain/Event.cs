@@ -205,7 +205,13 @@ namespace EventManager.Models.Domain
         /// This field is set by the event's creator and will determine the maximum number of automated ruleset "Standby" registrations are allowed.
         /// </remarks>
         public uint MaximumStandbyRegistrationsCount { get; private set; }
-        public Address AddressFactory { get; set; }
+        /// <summary>
+        /// Value object Address that represents the Event location
+        /// </summary>
+        public Address AddressFactory { get; private set; }
+        /// <summary>
+        /// Invokes the AddressFactory.FullAddress to show the Event's full address
+        /// </summary>
         public string Address => AddressFactory.FullAddress;
         public int EventTypeId { get; private set; }
         public virtual EventType EventType { get; private set; }        

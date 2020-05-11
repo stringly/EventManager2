@@ -28,7 +28,7 @@ namespace EventManager.Data
             builder.Entity<Event>()
                 .Property(x => x.FundCenter)
                 .HasField("_fundCenter");
-            
+            builder.Entity<Event>().OwnsOne(p => p.AddressFactory);
             // Collection shadow property
             var navigation = builder.Entity<Event>()
                 .Metadata.FindNavigation(nameof(Event.Registrations));
@@ -50,7 +50,7 @@ namespace EventManager.Data
             builder.Entity<User>()
                 .Property(x => x.ContactNumber)
                 .HasField("_contactNumber");
-
+            builder.Entity<User>().OwnsOne(p => p.NameFactory);
             // Collection shadow property
             var navigation1 = builder.Entity<User>()
                 .Metadata.FindNavigation(nameof(User.Registrations));
