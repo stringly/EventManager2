@@ -8,36 +8,84 @@ namespace EventManager.Models.ViewModels
 {
     public class EventTypeIndexViewModel : IndexViewModel
     {
-        public string TypeNameSortOrder { get; set; }
-        public string TypeEventCountSortOrder { get; set; }
-
-        public List<EventTypeIndexViewModelEventTypeItem> EventTypes { get; private set;}
-        public EventTypeIndexViewModel(int pageSize = 25)
+        public EventTypeIndexViewModel(IEnumerable<EventType> eventTypes, string sortOrder, string searchString, int page = 1, int pageSize = 25)
         {
-            PagingInfo = new PagingInfo { ItemsPerPage = pageSize };
-        }
-        public void InitializeEventTypeList(List<EventType> eventTypes, int page)
-        {
-            PagingInfo.TotalItems = eventTypes.Count();
-            PagingInfo.CurrentPage = page;
+            PagingInfo = new PagingInfo { 
+                ItemsPerPage = pageSize,
+                CurrentPage = page,
+                TotalItems = eventTypes.Count()
+            };
+            CurrentSort = sortOrder;
+            CurrentFilter = searchString;
             EventTypes = eventTypes
-                .Skip((PagingInfo.CurrentPage - 1) * PagingInfo.ItemsPerPage)
-                .Take(PagingInfo.ItemsPerPage)
-                .ToList()                
-                .ConvertAll(x => new EventTypeIndexViewModelEventTypeItem(x));            
+                .ToList()
+                .ConvertAll(x => new EventTypeIndexViewModelEventTypeItem(x));
+            ApplySort(sortOrder);
+            ApplyFilter(searchString);
+        }
+        public string TypeNameSortOrder { get; private set; }
+        public string TypeEventCountSortOrder { get; private set; }
+
+        public IEnumerable<EventTypeIndexViewModelEventTypeItem> EventTypes { get; private set;}
+
+        private void ApplySort(string sortOrder)
+        {
+            switch (sortOrder)
+            {
+                case "eventTypeName_desc":
+                    EventTypes = EventTypes.OrderByDescending(x => x.EventTypeName).ToList();
+                    break;
+                case "EventCount":
+                    EventTypes = EventTypes.OrderBy(x => x.EventCount).ToList();
+                    break;
+                case "eventCount_desc":
+                    EventTypes = EventTypes.OrderByDescending(x => x.EventCount).ToList();
+                    break;
+                default:
+                    EventTypes = EventTypes.OrderBy(x => x.EventTypeName).ToList();
+                    break;
+            }
+            TypeNameSortOrder = String.IsNullOrEmpty(sortOrder) ? "eventTypeName_desc" : "";
+            TypeEventCountSortOrder = sortOrder == "EventCount" ? "eventCount_desc" : "EventCount";
+        }
+        private void ApplyFilter(string searchString)
+        {
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                char[] arr = searchString.ToCharArray();
+                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
+                                  || char.IsWhiteSpace(c)
+                                  || c == '-')));
+                string lowerString = new string(arr);
+                lowerString = lowerString.ToLower();
+                EventTypes = EventTypes
+                    .Where(x => x.EventTypeName.ToLower().Contains(lowerString))
+                    .ToList();
+            }
         }
 
     }
     public class EventTypeIndexViewModelEventTypeItem
     {
-        public int EventTypeId { get; set; }
-        public string EventTypeName { get; set; }
-        public int EventCount { get; set; }
+        public int EventTypeId { get; private set; }
+        public string EventTypeName { get; private set; }
+        public int EventCount { get; private set; }
         public EventTypeIndexViewModelEventTypeItem(EventType e)
         {
-            EventTypeId = e.Id;
-            EventTypeName = e.EventTypeName;
-            EventCount = e?.Events?.Count() ?? 0;
+            if (e == null)
+            {
+                throw new ArgumentNullException("Cannot construct item from null EventType", nameof(e));
+            }
+            else if (e.Events == null)
+            {
+                throw new ArgumentNullException("Cannot construct item from EventType with null Events collection", nameof(e.Events));
+            }
+            else
+            {
+                EventTypeId = e.Id;
+                EventTypeName = e.EventTypeName;
+                EventCount = e.Events.Count();
+            }            
         }
     }
 }

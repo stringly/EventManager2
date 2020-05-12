@@ -126,21 +126,7 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Index" title="Sort by End Date"
-                               asp-route-sortOrder="@Model.StartDateSort"
-                               asp-route-searchString="@Model.CurrentFilter"
-                               asp-route-UserId="@Model.SelectedUserId"
-                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
-                                End Date
-                                @if (Model.CurrentSort == "endDate_desc")
-                                {
-                                    <i class="fas fa-sort-numeric-up"></i>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-sort-numeric-down"></i>
-                                }
-                            </a>
+                            End Date
                         </th>
                         <th>
                             <a asp-page="/Index" title="Sort by Creator"

@@ -1,4 +1,5 @@
 ﻿using EventManager.Models.Domain;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,38 +9,85 @@ namespace EventManager.Models.ViewModels
 {
     public class RankIndexViewModel : IndexViewModel
     {
-        public string RankIdSort { get; set; }
-        public string RankNameSort { get; set; }
+        public RankIndexViewModel(IEnumerable<Rank> ranks, string sortOrder, string searchString, int page = 1, int pageSize = 25)
+        {
+            PagingInfo = new PagingInfo { 
+                ItemsPerPage = pageSize,
+                CurrentPage = page,
+                TotalItems = ranks.Count()
+            };
+            CurrentSort = sortOrder;
+            CurrentFilter = searchString;
+            Ranks = ranks.ToList().ConvertAll(x => new RankIndexViewModelRankItem(x));
+            ApplySort(sortOrder);
+            ApplyFilter(searchString);
+
+        }
+        public string RankIdSort { get; private set; }
+        public string RankNameSort { get; private set; }
         public List<RankIndexViewModelRankItem> Ranks { get; private set; }
 
-        public RankIndexViewModel(int pageSize)
+        public void ApplySort(string sortOrder)
         {
-            PagingInfo = new PagingInfo { ItemsPerPage = pageSize };
+            switch (sortOrder)
+            {
+                case "RankName":
+                    Ranks = Ranks.OrderBy(x => x.RankFullName).ToList();
+                    break;
+                case "rankName_desc":
+                    Ranks = Ranks.OrderByDescending(x => x.RankFullName).ToList();
+                    break;
+                case "rankId_desc":
+                    Ranks = Ranks.OrderByDescending(x => x.RankId).ToList();
+                    break;
+                default:
+                    Ranks = Ranks.OrderBy(x => x.RankId).ToList();
+                    break;
+            }
+            RankIdSort = String.IsNullOrEmpty(sortOrder) ? "rankId_desc" : "";
+            RankNameSort = sortOrder == "RankName" ? "rankName_desc" : "RankName";
         }
-        public void InitializeRankList(List<Rank> ranks, int page)
+        public void ApplyFilter(string searchString)
         {
-            PagingInfo.TotalItems = ranks.Count();
-            PagingInfo.CurrentPage = page;
-            Ranks = ranks
-                .Skip((PagingInfo.CurrentPage - 1) * PagingInfo.ItemsPerPage)
-                .Take(PagingInfo.ItemsPerPage)
-                .ToList()
-                .ConvertAll(x => new RankIndexViewModelRankItem(x));
-            
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                char[] arr = searchString.ToCharArray();
+                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
+                                  || char.IsWhiteSpace(c)
+                                  || c == '-')));
+                string lowerString = new string(arr);
+                lowerString = lowerString.ToLower();
+                Ranks = Ranks
+                    .Where(x => x.RankFullName.ToLower().Contains(lowerString) || x.Abbreviation.ToLower().Contains(lowerString))
+                    .ToList();
+            }
         }
     }
 
     public class RankIndexViewModelRankItem
     {
-        public int RankId { get;set;}
-        public string Abbreviation { get; set; }
-        public string RankFullName { get; set; }
+        public int RankId { get; private set; }
+        public string Abbreviation { get; private set; }
+        public string RankFullName { get; private set; }
+        public int UserCount { get; private set; }
 
         public RankIndexViewModelRankItem(Rank r)
         {
-            RankId = r.Id;
-            Abbreviation = r.Short;
-            RankFullName = r.Full;
+            if (r == null)
+            {
+                throw new ArgumentNullException("Cannot construct item from null Rank object", nameof(r));
+            }
+            else if (r.Users == null)
+            {
+                throw new ArgumentNullException("Cannot construct item from Rank object with null User collection", nameof(r.Users));
+            }
+            else
+            {
+                RankId = r.Id;
+                Abbreviation = r.Short;
+                RankFullName = r.Full;
+                UserCount = r.Users.Count();
+            }
         }
     }
 }

@@ -57,7 +57,7 @@ namespace EventManager.Data
                 }
                 List<User> admins = new List<User>()
                 {                    
-                    new User("jcsmith1", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank),                 
+                    new User("jc30", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank),                 
                     new User("jcsmith1", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank)
 
                 };

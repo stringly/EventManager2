@@ -8,6 +8,6 @@ namespace EventManager.Data.Core.Repositories
 {
     public interface IEventSeriesRepository : IRepository<EventSeries>
     {
-        Task<IEnumerable<EventSeries>> GetEventSeriesWithEventsAsync(int filterByEventSeriesId = 0);
+        Task<IEnumerable<EventSeries>> GetEventSeriesWithEventsAsync(int filterByEventSeriesId = 0, int page = 1, int pageSize = 25);
     }
 }

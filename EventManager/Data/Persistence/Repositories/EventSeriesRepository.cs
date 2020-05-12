@@ -18,10 +18,12 @@ namespace EventManager.Data.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<EventSeries>> GetEventSeriesWithEventsAsync(int filterByEventSeriesId = 0)
+        public async Task<IEnumerable<EventSeries>> GetEventSeriesWithEventsAsync(int filterByEventSeriesId = 0, int page = 1, int pageSize = 25)
         {
             return await EventManagerContext.EventSerieses
                 .Where(x => (filterByEventSeriesId == 0 || x.Id == filterByEventSeriesId))
+                .Skip((page -1) * pageSize)
+                .Take(pageSize)
                 .Include(x => x.Events)
                     .ThenInclude(x => x.EventType)
                 .ToListAsync();

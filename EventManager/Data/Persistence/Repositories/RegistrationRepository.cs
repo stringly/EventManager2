@@ -23,10 +23,12 @@ namespace EventManager.Data.Persistence.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Registration>> GetRegistrationsWithUserAndEvent(int filterByUserId = 0, int filterByEventId = 0, int filterByEventTypeId = 0)
+        public async Task<IEnumerable<Registration>> GetRegistrationsWithUserAndEvent(int filterByUserId = 0, int filterByEventId = 0, int filterByEventTypeId = 0, int page = 1, int pageSize = 25)
         {
             return await EventManagerContext.Registrations
                 .Where(x => (filterByUserId == 0 || x.UserId == filterByUserId) && (filterByEventId == 0 || x.EventId == filterByEventId) && (filterByEventTypeId == 0 || x.Event.EventTypeId == filterByEventTypeId))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Include(x => x.User)
                     .ThenInclude(x => x.Rank)
                 .Include(x => x.Event)

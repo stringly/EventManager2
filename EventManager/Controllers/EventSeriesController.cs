@@ -28,46 +28,14 @@ namespace EventManager.Controllers
 
         public async Task<IActionResult> Index(string sortOrder, string searchString, int page = 1)
         {
-            EventSeriesIndexViewModel vm = new EventSeriesIndexViewModel(PageSize);
-            vm.CurrentSort = sortOrder;
-            vm.CurrentFilter = searchString;
-            vm.EventSeriesIdSort = String.IsNullOrEmpty(sortOrder) ? "eventSeriesId_desc" : "";
-            vm.TitleSort = sortOrder == "EventTitle" ? "eventTitle_desc" : "EventTitle";
-
-            IEnumerable<EventSeries> eventSeries = await unitOfWork.EventSeries.GetAllAsync();
-            
-            switch (sortOrder)
-            {
-                case "eventSeriesId_desc":
-                    eventSeries = eventSeries.OrderBy(x => x.Id).ToList();
-                    break;
-                case "EventTitle":
-                    eventSeries = eventSeries.OrderBy(x => x.Title).ToList();
-                    break;
-                case "eventTitle_desc":
-                    eventSeries = eventSeries.OrderByDescending(x => x.Title).ToList();
-                    break;                
-                default:
-                    eventSeries = eventSeries.OrderByDescending(x => x.Id).ToList();
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                char[] arr = searchString.ToCharArray();
-                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
-                                  || char.IsWhiteSpace(c)
-                                  || c == '-')));
-                string lowerString = new string(arr);
-                lowerString = lowerString.ToLower();
-                eventSeries = eventSeries
-                    .Where(x => x.Title.ToLower().Contains(lowerString)
-                        || x.Description.ToLower().Contains(lowerString))
-                    .ToList();
-            }
-            vm.IntitializeEventSeriesList(eventSeries.ToList(), page);
-            vm.PagingInfo.ItemsPerPage = PageSize;
-            vm.PagingInfo.CurrentPage = page;
+            IEnumerable<EventSeries> eventSeries = await unitOfWork.EventSeries.GetEventSeriesWithEventsAsync(0,page,PageSize);
+            EventSeriesIndexViewModel vm = new EventSeriesIndexViewModel(
+                    eventSeries,
+                    sortOrder,
+                    searchString,
+                    page,
+                    PageSize
+                );
             ViewData["ActiveMenu"] = "Admin";
             ViewData["ActiveLink"] = "EventSeriesIndex";
             return View(vm);

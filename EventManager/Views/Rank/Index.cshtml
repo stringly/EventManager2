@@ -28,7 +28,7 @@
             <table class="table table-striped table-sm table-light indexTable">
                 <thead>
                     <tr class="tablePageControlHeaderRow">
-                        <th colspan="4">
+                        <th colspan="5">
                             <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
                                  page-class="" page-class-normal=""
                                  page-class-selected="active"
@@ -72,6 +72,9 @@
                         <th>
                             Abbreviation
                         </th>
+                        <th class="text-center">
+                            Users
+                        </th>
                         <th>
 
                         </th>
@@ -92,6 +95,9 @@
                                 <td>
                                     @r.Abbreviation
                                 </td>
+                                <td class="text-center">
+                                    @r.UserCount
+                                </td>
                                 <td class="text-right">
                                     <a asp-action="Details" asp-route-id="@r.RankId" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
                                         <i class="fas fa-info-circle"></i>
@@ -109,7 +115,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center">No matching Ranks were found.</td>
+                            <td colspan="5" class="text-center">No matching Ranks were found.</td>
                         </tr>
                     }
                 </tbody>

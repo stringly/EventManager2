@@ -1,5 +1,6 @@
 ﻿using EventManager.Data.Core.Repositories;
 using EventManager.Models.Domain;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,15 +25,21 @@ namespace EventManager.Data.Persistence.Repositories
         /// <param name="filterByCreatorUserId">Optional parameter to filter the result by only events with the given Creator UserId</param>
         /// /// <param name="filterByEventSeriesId">Optional parameter to filter the result by only events with the given Event Series Id</param>
         /// <returns>a Task<List<Event>> of the matching Events.</Event></returns>
-        public async Task<IEnumerable<Event>> GetEventsWithCreatorEventTypeAndSeriesAsnyc(int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0)
+        public async Task<IEnumerable<Event>> GetEventsWithCreatorEventTypeAndSeriesAsnyc(int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0, int page = 1, int pageSize = 25)
         {
             return await EventManagerContext.Events
                 .Where(x => (filterByEventTypeId == 0 || x.EventTypeId == filterByEventTypeId) && (filterByCreatorUserId == 0 || x.OwnerId == filterByCreatorUserId) && (filterByEventSeriesId == 0 || x.EventSeriesId == filterByEventSeriesId) )
-                    .Include(x => x.Owner)
+                .Skip((page-1) * pageSize)
+                .Take(pageSize)
+                .Include(x => x.Owner)
                         .ThenInclude(x => x.Rank)
                     .Include(x => x.EventType)
                     .Include(x => x.EventSeries)
                     .ToListAsync();
+        }
+        public SelectList GetEventSelectList()
+        {
+            return new SelectList(EventManagerContext.Events, nameof(Event.Id), nameof(Event.Title));
         }
 
     }

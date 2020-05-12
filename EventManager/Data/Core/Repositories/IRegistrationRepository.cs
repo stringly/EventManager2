@@ -9,7 +9,7 @@ namespace EventManager.Data.Core.Repositories
     public interface IRegistrationRepository : IRepository<Registration>
     {
         Task<IEnumerable<Registration>> GetRegistrationsForUserId(int userId);
-        Task<IEnumerable<Registration>> GetRegistrationsWithUserAndEvent(int filterByUserId = 0, int filterByEventId = 0, int filterByEventTypeId = 0);
+        Task<IEnumerable<Registration>> GetRegistrationsWithUserAndEvent(int filterByUserId = 0, int filterByEventId = 0, int filterByEventTypeId = 0, int page = 1, int pageSize = 25);
         
     }
 }

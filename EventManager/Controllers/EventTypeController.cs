@@ -28,41 +28,16 @@ namespace EventManager.Controllers
         }
         public async Task<IActionResult> Index(string sortOrder, string searchString, int page = 1)
         {
-            EventTypeIndexViewModel vm = new EventTypeIndexViewModel(PageSize);
-            vm.CurrentSort = sortOrder;
-            vm.CurrentFilter = searchString;
-            vm.TypeNameSortOrder = String.IsNullOrEmpty(sortOrder) ? "eventTypeName_desc" : "";
-            vm.TypeEventCountSortOrder = sortOrder == "EventCount" ? "eventCount_desc" : "EventCount";
-
-            IEnumerable<EventType> eventTypes = await unitOfWork.EventTypes.GetAllAsync();
-            switch (sortOrder)
-            {
-                case "eventTypeName_desc":
-                    eventTypes = eventTypes.OrderByDescending(x => x.EventTypeName).ToList();
-                    break;
-                case "EventCount":
-                    eventTypes = eventTypes.OrderBy(x => x.Events.Count()).ToList();
-                    break;
-                case "eventCount_desc":
-                    eventTypes = eventTypes.OrderByDescending(x => x.Events.Count()).ToList();
-                    break;
-                default:
-                    eventTypes = eventTypes.OrderBy(x => x.EventTypeName).ToList();
-                    break;
-            }
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                char[] arr = searchString.ToCharArray();
-                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
-                                  || char.IsWhiteSpace(c)
-                                  || c == '-')));
-                string lowerString = new string(arr);
-                lowerString = lowerString.ToLower();
-                eventTypes = eventTypes
-                    .Where(x => x.EventTypeName.ToLower().Contains(lowerString))
-                    .ToList();
-            }
-            vm.InitializeEventTypeList(eventTypes.ToList(), page);
+            IEnumerable<EventType> eventTypes = await unitOfWork.EventTypes.GetEventTypesWithEventsAsync(0,page, PageSize);
+            EventTypeIndexViewModel vm = 
+                new EventTypeIndexViewModel(
+                eventTypes,
+                sortOrder,
+                searchString,
+                page,
+                PageSize
+                );
+            
             ViewData["ActiveMenu"] = "Admin";
             ViewData["ActiveLink"] = "EventTypeIndex";
             return View(vm);

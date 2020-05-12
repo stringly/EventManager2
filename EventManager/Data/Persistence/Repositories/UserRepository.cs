@@ -1,5 +1,6 @@
 ﻿using EventManager.Data.Core.Repositories;
 using EventManager.Models.Domain;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,13 +15,6 @@ namespace EventManager.Data.Persistence.Repositories
             : base(context)
         {
         }
-        public async Task<IEnumerable<User>> GetUsersByRankAsync(int filterByRankId = 0)
-        {
-            return await EventManagerContext.Users
-                .Where(x => (filterByRankId == 0 || x.RankId == filterByRankId))
-                .Include(x => x.Rank)
-                .ToListAsync();
-        }
         public async Task<IEnumerable<User>> GetUsersWithRegistrationsAsync()
         {
             return await EventManagerContext.Users
@@ -29,6 +23,30 @@ namespace EventManager.Data.Persistence.Repositories
                     .ThenInclude(x => x.Event)
                 .ToListAsync();
         }
+        public SelectList GetUserSelectList()
+        {
+            return new SelectList(EventManagerContext.Users, nameof(User.Id), nameof(User.DisplayName));
+        }
+
+        public async Task<IEnumerable<User>> GetUsersWithRankAsync(int selectedRankId = 0, int page = 1, int pageSize = 25)
+        {
+            return await EventManagerContext.Users
+                .Where(x => (selectedRankId == 0 || x.RankId == selectedRankId))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Include(x => x.Rank)
+                .ToListAsync();
+        }
+
+        public IEnumerable<User> GetUsersWithRank(int selectedRankId = 0, int page = 1, int pageSize = 25)
+        {
+            return EventManagerContext.Users
+                .Where(x => (selectedRankId == 0 || x.RankId == selectedRankId))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Include(x => x.Rank);                
+        }
+
         public EventManagerContext EventManagerContext {
             get { return context as EventManagerContext; }
         }

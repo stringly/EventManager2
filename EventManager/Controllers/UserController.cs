@@ -3,6 +3,7 @@ using EventManager.Models.Domain;
 using EventManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,52 +27,17 @@ namespace EventManager.Controllers
         }
         public async Task<IActionResult> Index(string sortOrder, string searchString, int SelectedRankId = 0, int page = 1)
         {
-            UserIndexViewModel vm = new UserIndexViewModel(PageSize);
-            vm.CurrentSort = sortOrder;
-            vm.CurrentFilter = searchString;
-            vm.LastNameSort = String.IsNullOrEmpty(sortOrder) ? "lastName_desc" : "";
-            vm.BadgeNumberSort = sortOrder == "BadgeNumber" ? "badgeNumber_desc" : "BadgeNumber";
-            vm.RankSort = sortOrder == "Rank" ? "rank_desc" : "Rank";
-            vm.SelectedRankId = SelectedRankId;
-
-            IEnumerable<User> users = await unitOfWork.Users.GetUsersByRankAsync(SelectedRankId);
-
-            switch (sortOrder)
-            {
-                case "BadgeNumber":
-                    users = users.OrderBy(x => x.IdNumber).ToList();
-                    break;
-                case "badgeNumber_desc":
-                    users = users.OrderByDescending(x => x.IdNumber).ToList();
-                    break;
-                case "Rank":
-                    users = users.OrderBy(x => x.RankId).ToList();
-                    break;
-                case "rank_desc":
-                    users = users.OrderByDescending(x => x.RankId).ToList();
-                    break;
-                case "lastName_desc":
-                    users = users.OrderByDescending(x => x.NameFactory.Last).ToList();
-                    break;
-                default:
-                    users = users.OrderBy(x => x.NameFactory.First).ToList();
-                    break;
-            }
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                char[] arr = searchString.ToCharArray();
-                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
-                                  || char.IsWhiteSpace(c)
-                                  || c == '-')));
-                string lowerString = new string(arr);
-                lowerString = lowerString.ToLower();
-                users = users
-                    .Where(x => x.Name.ToLower().Contains(lowerString)                        
-                        || x.Email.ToLower().Contains(lowerString)
-                        || x.IdNumber.ToLower().Contains(lowerString))
-                    .ToList();
-            }
-            vm.InitializeUserList(users.ToList(), page);            
+            IEnumerable<User> users = await unitOfWork.Users.GetUsersWithRankAsync(SelectedRankId, page, PageSize);
+            SelectList ranks = unitOfWork.Ranks.GetRankSelectList();
+            UserIndexViewModel vm = new UserIndexViewModel(
+                users,
+                ranks,
+                SelectedRankId,
+                sortOrder, 
+                searchString,
+                page,
+                PageSize);
+                 
             ViewData["ActiveMenu"] = "Admin";
             ViewData["ActiveLink"] = "UserIndex";
             return View(vm);

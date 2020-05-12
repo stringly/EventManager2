@@ -3,6 +3,7 @@ using EventManager.Models.Domain;
 using EventManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,116 +28,21 @@ namespace EventManager.Controllers
 
         public async Task<IActionResult> Index(string sortOrder, string searchString, int SelectedEventTypeId = 0, int SelectedUserId = 0, int page = 1)
         {
-            EventIndexViewModel vm = new EventIndexViewModel(PageSize);
-            vm.CurrentSort = sortOrder;
-            vm.CurrentFilter = searchString;
-            vm.StartDateSort = sortOrder == "StartDate" ? "startDate_desc" : "StartDate";
-            vm.UserIdSort = sortOrder == "UserId" ? "userId_desc" : "UserId";
-            vm.EventTypeSort = sortOrder == "EventType" ? "eventType_desc" : "EventType";
-            vm.EventSeriesSort = sortOrder == "EventSeries" ? "eventSeries_desc" : "EventSeries";
-            vm.SelectedEventTypeId = SelectedEventTypeId;
-            vm.SelectedUserId = SelectedUserId;
-            IEnumerable<Event> events = await unitOfWork.Events.GetEventsWithCreatorEventTypeAndSeriesAsnyc(SelectedEventTypeId, SelectedUserId);
-            //List<Event> events = new List<Event>();
+            IEnumerable<Event> events = await unitOfWork.Events.GetEventsWithCreatorEventTypeAndSeriesAsnyc(SelectedEventTypeId, SelectedUserId, 0, page, PageSize);
+            SelectList userSelect = unitOfWork.Users.GetUserSelectList();
+            SelectList eventTypeSelect = unitOfWork.EventTypes.GetEventTypeSelectList();
 
-            //if (SelectedUserId == 0 && SelectedEventTypeId == 0)
-            //{
-            //    // no user/type filters selected
-            //    events = await _context.Events
-            //        .Include(x => x.Creator)
-            //            .ThenInclude(x => x.Rank)
-            //        .Include(x => x.EventType)
-            //        .Include(x => x.EventSeries)
-            //        .ToListAsync();
-            //}
-            //else if (SelectedUserId == 0 && SelectedEventTypeId != 0)
-            //{
-            //    // event type only
-            //    events = await _context.Events
-            //        .Where(x => x.EventTypeId == SelectedEventTypeId)
-            //        .Include(x => x.Creator)
-            //            .ThenInclude(x => x.Rank)
-            //        .Include(x => x.EventType)
-            //        .Include(x => x.EventSeries)
-            //        .ToListAsync();
-                
-            //}
-            //else if (SelectedUserId != 0 && SelectedEventTypeId == 0)
-            //{
-            //    // user only
-            //    events = await _context.Events
-            //        .Where(x => x.CreatorId == SelectedUserId)
-            //        .Include(x => x.Creator)
-            //            .ThenInclude(x => x.Rank)
-            //        .Include(x => x.EventType)
-            //        .Include(x => x.EventSeries)
-            //        .ToListAsync();
-                
-            //}
-            //else if(SelectedUserId != 0 && SelectedEventTypeId != 0)
-            //{
-            //    // user and event type
-            //    // event type only
-            //    events = await _context.Events
-            //        .Where(x => x.EventTypeId == SelectedEventTypeId && x.CreatorId == SelectedUserId)
-            //        .Include(x => x.Creator)
-            //            .ThenInclude(x => x.Rank)
-            //        .Include(x => x.EventType)
-            //        .Include(x => x.EventSeries)
-            //        .ToListAsync();
-            //}
-            switch (sortOrder)
-            {
-                case "createdDate_desc":
-                    events = events.OrderBy(x => x.Id).ToList();
-                    break;
-                case "StartDate":
-                    events = events.OrderBy(x => x.StartDate).ToList();
-                    break;
-                case "startDate_desc":
-                    events = events.OrderByDescending(x => x.StartDate).ToList();
-                    break;
-                case "UserId":
-                    events = events.OrderBy(x => x.OwnerId).ToList();
-                    break;
-                case "userId_desc":
-                    events = events.OrderByDescending(x => x.OwnerId).ToList();
-                    break;
-                case "EventType":
-                    events = events.OrderBy(x => x.EventTypeId).ToList();
-                    break;
-                case "eventType_desc":
-                    events = events.OrderByDescending(x => x.EventTypeId).ToList();
-                    break;
-                case "EventSeries":
-                    events = events.OrderBy(x => x.EventSeriesId).ToList();
-                    break;
-                case "eventSeries_desc":
-                    events = events.OrderByDescending(x => x.EventSeriesId).ToList();
-                    break;
-                default: 
-                    events = events.OrderByDescending(x => x.Id).ToList();
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                char[] arr = searchString.ToCharArray();
-                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
-                                  || char.IsWhiteSpace(c)
-                                  || c == '-')));
-                string lowerString = new string(arr);
-                lowerString = lowerString.ToLower();
-                events = events
-                    .Where(x => x.Title.ToLower().Contains(lowerString)
-                        || x.EventSeries.Title.ToLower().Contains(lowerString)
-                        || x.Owner.DisplayName.ToLower().Contains(lowerString)
-                        || x.Owner.Email.ToLower().Contains(lowerString))
-                    .ToList();
-            }
-            vm.InitializeEventList(events.ToList(), page);
-            vm.PagingInfo.ItemsPerPage = PageSize;
-            vm.PagingInfo.CurrentPage = page;
+            EventIndexViewModel vm = new EventIndexViewModel(
+                events,
+                userSelect,
+                eventTypeSelect,
+                SelectedUserId,
+                SelectedEventTypeId, 
+                sortOrder,
+                searchString,
+                page,
+                PageSize);
+            
             ViewData["ActiveMenu"] = "Admin";
             ViewData["ActiveLink"] = "EventIndex";
             return View(vm);
