@@ -1,5 +1,6 @@
 ﻿using EventManager.Data.Core.Repositories;
 using EventManager.Models.Domain;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,10 +11,19 @@ using System.Threading.Tasks;
 namespace EventManager.Data.Persistence.Repositories
 {
     public class UserRepository : Repository<User>, IUserRepository
-    {
+    {        
+        private string _currentUserName;
         public UserRepository(EventManagerContext context)
             : base(context)
+        {            
+        }
+        public async Task<User> GetUserByLDAPNameAsync(string LDAPName)
         {
+            return await EventManagerContext.Users.FirstOrDefaultAsync(x => x.LDAPName == LDAPName);
+        }
+        public User GetUserByLDAPName(string LDAPName)
+        {
+            return EventManagerContext.Users.FirstOrDefault(x => x.LDAPName == LDAPName);
         }
         public async Task<IEnumerable<User>> GetUsersWithRegistrationsAsync()
         {

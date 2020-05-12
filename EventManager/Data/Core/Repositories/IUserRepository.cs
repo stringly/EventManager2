@@ -9,6 +9,8 @@ namespace EventManager.Data.Core.Repositories
 {
     public interface IUserRepository : IRepository<User>
     {
+        Task<User> GetUserByLDAPNameAsync(string LDAPName);
+        User GetUserByLDAPName(string LDAPName);
         Task<IEnumerable<User>> GetUsersWithRankAsync(int selectedRankId = 0, int page = 1, int pageSize = 25);
         IEnumerable<User> GetUsersWithRank(int selectedRankId = 0, int page = 1, int pageSize = 25);
         Task<IEnumerable<User>> GetUsersWithRegistrationsAsync();

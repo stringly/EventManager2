@@ -1,6 +1,8 @@
 ﻿using EventManager.Data;
 using EventManager.Data.Core;
+using EventManager.Data.Core.Services;
 using EventManager.Data.Persistence;
+using EventManager.Data.Persistence.Services;
 using EventManager.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -37,7 +39,9 @@ namespace EventManager
             services.AddDbContext<EventManagerContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+            services.AddHttpContextAccessor();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IEventService, EventService>();
             services.AddAuthentication(Microsoft.AspNetCore.Server.IISIntegration.IISDefaults.AuthenticationScheme);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

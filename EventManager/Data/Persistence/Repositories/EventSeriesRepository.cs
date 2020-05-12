@@ -1,5 +1,6 @@
 ﻿using EventManager.Data.Core.Repositories;
 using EventManager.Models.Domain;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,9 @@ namespace EventManager.Data.Persistence.Repositories
                     .ThenInclude(x => x.EventType)
                 .ToListAsync();
         }
-
-        
+        public SelectList GetEventSeriesSelectList()
+        {
+            return new SelectList(EventManagerContext.EventSerieses, nameof(EventSeries.Id), nameof(EventSeries.Title));
+        }
     }
 }

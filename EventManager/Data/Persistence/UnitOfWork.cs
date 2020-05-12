@@ -1,13 +1,13 @@
 ﻿using EventManager.Data.Core;
 using EventManager.Data.Core.Repositories;
 using EventManager.Data.Persistence.Repositories;
+using EventManager.Models.Domain;
 
 namespace EventManager.Data.Persistence
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly EventManagerContext _context;
-
+        private readonly EventManagerContext _context;        
         public IEventRepository Events { get; private set; }
         public IEventSeriesRepository EventSeries { get; private set; }
         public IEventTypeRepository EventTypes { get; private set;}

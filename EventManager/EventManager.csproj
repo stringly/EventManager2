@@ -24,7 +24,6 @@
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Persistence\Entities\" />
-    <Folder Include="Models\Enums\" />
   </ItemGroup>
 
 </Project>
