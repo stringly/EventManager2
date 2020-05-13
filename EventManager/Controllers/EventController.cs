@@ -68,7 +68,26 @@ namespace EventManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind] EventAddViewModel form, string returnUrl)
+        public async Task<IActionResult> Create([Bind(
+            "EventTypeId," +
+            "EventSeriesId," +
+            "Title," +
+            "Description,"+
+            "FundCenter," +
+            "StartDate," +
+            "EndDate," +
+            "RegistrationOpenDate," +
+            "RegistrationClosedDate," +
+            "MinRegistrationCount," +
+            "MaxRegistrationCount," +
+            "AllowStandby," +
+            "MaxStandbyRegistrationCount,"+
+            "AddressLine1," +
+            "AddressLine2," +
+            "City," +
+            "State," +
+            "Zip"
+            )] EventAddViewModel form, string returnUrl)
         {
             if (!ModelState.IsValid)
             {

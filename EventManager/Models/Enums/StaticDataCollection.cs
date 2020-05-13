@@ -12,7 +12,7 @@ namespace EventManager.Models.Enums
         public SelectList States { get; private set; }
         public StaticDataCollection()
         {
-            States = new SelectList(new List<SelectListItem>()
+            List<SelectListItem> list = new List<SelectListItem>()
                 {
                     new SelectListItem { Value = "AL", Text = "Alabama" },
                     new SelectListItem { Value = "AK", Text = "Alaska" },
@@ -64,8 +64,9 @@ namespace EventManager.Models.Enums
                     new SelectListItem { Value = "WV", Text = "West Virginia" },
                     new SelectListItem { Value = "WI", Text = "Wisconsin" },
                     new SelectListItem { Value = "WY", Text = "Wyoming" }
-                }
-            );
+                };
+            States = new SelectList(list, "Value", "Text", "MD");
+            
             
         }
     }

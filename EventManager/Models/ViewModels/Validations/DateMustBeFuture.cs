@@ -11,9 +11,9 @@ namespace EventManager.Models.ViewModels.Validations
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var dateValue = value as DateTime? ?? new DateTime();
-            if (dateValue.Date < DateTime.Now.Date)
+            if (dateValue < DateTime.Now)
             {
-                return new ValidationResult("Start Date must be a future date.");
+                return new ValidationResult("Must be a future date.");
             }
             return ValidationResult.Success;
         }

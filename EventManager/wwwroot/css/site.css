@@ -71,7 +71,51 @@ body {
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
 }
+/* FORM CONTAINER STYLING */
+.formContainer {
+    margin-top: 10px;
+    /*box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);*/
+    background-color: #fff;
+}
 
+    .formContainer .formHeader {
+        border-bottom: 1px solid #e1e4e8;
+        display: flex;
+        flex-flow: row wrap;
+        margin: 0px 15px 15px 15px;
+        padding-bottom: 8px;
+    }
+
+.formHeader-heading {
+    flex: 1 1 auto;
+    font-size: 24px;
+    font-weight: lighter;
+    margin-bottom: 5px;
+    margin-top: 0px;
+}
+
+.formHeader-description {
+    color: #586069;
+    flex: 1 100%;
+    font-size: 14px;
+}
+
+.formContainer .formHeader a {
+    color: #0366d6;
+}
+
+    .formContainer .formHeader a:hover {
+        color: #55b6f2;
+    }
+
+.formContainer .formHeader h4 {
+    margin-top: 5px;
+}
+
+.formContainer .formBody {
+    padding: 5px 25px 10px 25px;
+}
+/* END FORM CONTAINER STYLING */
 /* START FORM CONTROL OVERRIDES*/
 .btn {
     border-radius: 3px;

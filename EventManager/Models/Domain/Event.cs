@@ -23,10 +23,10 @@ namespace EventManager.Models.Domain
             DateTime endDate, 
             DateTime registrationOpenDate,
             DateTime? registrationClosedDate = null,
-            uint maxRegistrations = 1,
-            uint minRegistrations = 0,
+            int maxRegistrations = 1,
+            int? minRegistrations = 0,
             bool allowStandbyRegistrations = false,
-            uint maxStandbyRegistrations = 0,
+            int? maxStandbyRegistrations = 0,
             string fundCenter = ""
             )
         {
@@ -103,10 +103,10 @@ namespace EventManager.Models.Domain
             {
                 Owner = creator;
             }
-            MinimumRegistrationsCount = minRegistrations;
-            MaximumRegistrationsCount = maxRegistrations;
+            MinimumRegistrationsCount = minRegistrations != null ? (uint)minRegistrations : 0;
+            MaximumRegistrationsCount = (uint)maxRegistrations;
             StandbyRegistrationsAllowed = allowStandbyRegistrations;
-            MaximumStandbyRegistrationsCount = maxStandbyRegistrations;
+            MaximumStandbyRegistrationsCount = maxStandbyRegistrations != null ? (uint)maxStandbyRegistrations : 0;
             if(location == null || location.IsEmpty())
             {
                 throw new ArgumentException("Address is null or empty.", nameof(location));

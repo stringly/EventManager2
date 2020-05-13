@@ -1,0 +1,178 @@
+﻿@model EventManager.Models.ViewModels.EventAddViewModel
+@section head{ 
+    <link href="~/lib/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+}
+@section scripts{ 
+    <script type="text/javascript" src="~/lib/moment/moment.min.js"></script>
+    <script type="text/javascript" src="~/lib/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript">
+        (function ($) {
+                var defaultOptions = {
+                    validClass: 'is-valid',
+                    errorClass: 'is-invalid',
+                    highlight: function (element, errorClass, validClass) {
+                        $(element)
+                            .removeClass(validClass)
+                            .addClass(errorClass);
+                    },
+                    unhighlight: function (element, errorClass, validClass) {
+                        $(element)
+                            .removeClass(errorClass)
+                            .addClass(validClass);
+                    }
+                };
+
+                $.validator.setDefaults(defaultOptions);
+
+                $.validator.unobtrusive.options = {
+                    errorClass: defaultOptions.errorClass,
+                    validClass: defaultOptions.validClass,
+                };
+            })(jQuery);
+        $(document).ready(function () {
+            $('#StartDate').datetimepicker();
+            $('#EndDate').datetimepicker();
+            $('#RegistrationOpenDate').datetimepicker();
+            $('#RegistrationClosedDate').datetimepicker();
+            $('input','form').blur(function () {
+                              $(this).valid();
+            });
+            $('textarea','form').blur(function () {
+                              $(this).valid();
+                    });
+        });
+    </script>
+}
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class='col-sm-auto col-lg-10'>
+            <div class="row">
+                    <h2 class="formHeader-heading">Create an Event</h2>
+                    <p class="formHeader-description">
+                        Provide the information below to create an Event and allow users to Register.
+                    </p>
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                <hr />
+            </div>            
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label asp-for="Title" class="control-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="StartDate" class="control-label"></label>
+                            <input type="text" asp-for="StartDate" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="EndDate" class="control-label"></label>
+                            <input type="text" asp-for="EndDate" class="form-control" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 form-group">
+                            <label asp-for="Description" class="control-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="10"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="EventTypeId" class="control-label"></label>
+                            <select asp-for="EventTypeId" asp-items="@Model.EventTypes" class="form-control"></select>
+                            <span asp-validation-for="EventTypeId" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="EventSeriesId" class="control-label"></label>
+                            <select asp-for="EventSeriesId" asp-items="@Model.EventSerieses" class="form-control"></select>
+                            <span asp-validation-for="EventSeriesId" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="FundCenter" class="control-label"></label>
+                            <input asp-for="FundCenter" class="form-control" />
+                            <span asp-validation-for="FundCenter" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="RegistrationOpenDate" class="control-label"></label>
+                            <input type="text" asp-for="RegistrationOpenDate" class="form-control" />
+                            <span asp-validation-for="RegistrationOpenDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="RegistrationClosedDate" class="control-label"></label>
+                            <input type="text" asp-for="RegistrationClosedDate" class="form-control" />
+                            <span asp-validation-for="RegistrationClosedDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="MinRegistrationCount" class="control-label"></label>
+                            <input asp-for="MinRegistrationCount" class="form-control" />
+                            <span asp-validation-for="MinRegistrationCount" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="MaxRegistrationCount" class="control-label"></label>
+                            <input asp-for="MaxRegistrationCount" class="form-control" />
+                            <span asp-validation-for="MaxRegistrationCount" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 form-group" style="margin-bottom:0px">
+                            <div class="form-checkbox">
+                                <label>
+                                    <input asp-for="AllowStandby" /> @Html.DisplayNameFor(model => model.AllowStandby)
+                                </label>
+                                <span class="note">
+                                    Allow Standby Registrations for this Event.
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="MaxStandbyRegistrationCount" class="control-label"></label>
+                            <input asp-for="MaxStandbyRegistrationCount" class="form-control" />
+                            <span asp-validation-for="MaxStandbyRegistrationCount" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label asp-for="AddressLine1" class="control-label"></label>
+                            <input asp-for="AddressLine1" class="form-control" />
+                            <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label asp-for="AddressLine2" class="control-label"></label>
+                            <input asp-for="AddressLine2" class="form-control" />
+                            <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="City" class="control-label"></label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="State" class="control-label"></label>
+                            <select asp-for="State" asp-items="@Model.States" class="form-control"></select>
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label asp-for="Zip" class="control-label"></label>
+                            <input asp-for="Zip" class="form-control" />
+                            <span asp-validation-for="Zip" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</div>
+

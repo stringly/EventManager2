@@ -14,7 +14,13 @@ namespace EventManager.Models.ViewModels
 {
     public class EventAddViewModel
     {
-        public EventAddViewModel() {}
+        public EventAddViewModel() {
+            DateTime defaultDate = DateTime.Now;
+            StartDate = defaultDate;
+            EndDate = defaultDate.AddHours(10);
+            RegistrationOpenDate = defaultDate;
+            RegistrationClosedDate = defaultDate;
+            }
         public EventAddViewModel(Event e)
         {
             if (e == null)
@@ -33,10 +39,10 @@ namespace EventManager.Models.ViewModels
                 EndDate = e.EndDate;
                 RegistrationOpenDate = e.RegistrationOpenDate;
                 RegistrationClosedDate = e.RegistrationClosedDate;
-                MinRegistrationCount = e.MinimumRegistrationsCount;
-                MaxRegistrationCount = e.MaximumRegistrationsCount;
+                MinRegistrationCount = (int)e.MinimumRegistrationsCount;
+                MaxRegistrationCount = (int)e.MaximumRegistrationsCount;
                 AllowStandby = e.StandbyRegistrationsAllowed;
-                MaxStandbyRegistrationCount = e.MaximumStandbyRegistrationsCount;
+                MaxStandbyRegistrationCount = (int)e.MaximumStandbyRegistrationsCount;
                 AddressLine1 = e.AddressFactory.AddressLine1;
                 AddressLine2 = e.AddressFactory.AddressLine2;
                 City = e.AddressFactory.City;
@@ -45,56 +51,56 @@ namespace EventManager.Models.ViewModels
             }
         }
         [Display(Name = "Event Id")]
-        public int Id { get; private set; }
+        public int Id { get; set; }
         [Display(Name = "Event Type"), Required]
-        public int EventTypeId { get; private set; }
+        public int EventTypeId { get; set; }
         [Display(Name = "Event Series")]
-        public int EventSeriesId { get; private set; }
+        public int? EventSeriesId { get; set; }
         [Display(Name = "Title"), 
             Required(ErrorMessage = "Event Title is required"), 
             StringLength(50, ErrorMessage = "Event Title cannot be longer than 50 characters")]
-        public string Title { get; private set; }
+        public string Title { get; set; }
         [Display(Name = "Description"), Required]
-        public string Description { get; private set; }
+        public string Description { get; set; }
         [Display(Name = "Fund Center"), 
             StringLength(25, ErrorMessage = "Fund Center cannot be longer than 25 characters.")]
-        public string FundCenter { get; private set; }
+        public string FundCenter { get; set; }
         [Display(Name = "Start Date/Time"), 
             Required, 
             DateMustBeFuture]
-        public DateTime StartDate { get; private set; }
+        public DateTime StartDate { get; set; }
         [Display(Name = "End Date/Time"), 
             Required, 
             MustBeAfterDate("StartDate", ErrorMessage = "Event End Date/Time must be after Start Date/Time")]
-        public DateTime EndDate { get; private set; }
+        public DateTime EndDate { get; set; }
         [Display(Name = "Registration Open Date"), 
             Required, 
             DateMustBeFuture]
-        public DateTime RegistrationOpenDate { get; private set; }
+        public DateTime RegistrationOpenDate { get; set; }
         [Display(Name = "Registration Closed Date"), 
             Required, 
             MustBeBeforeDate("StartDate", ErrorMessage = "Registration period Start Date cannot be after the Event's Start Date"), 
             MustBeAfterDate("RegistrationOpenDate", ErrorMessage = "Registration Period End Date cannot be before the Registration Period End Date")]
-        public DateTime RegistrationClosedDate { get; private set; }
+        public DateTime RegistrationClosedDate { get; set; }
         [Display(Name = "Min Registrations")]
-        public uint MinRegistrationCount { get; private set; }
+        public int? MinRegistrationCount { get; set; }
         [Display(Name = "Max Registrations")]
-        public uint MaxRegistrationCount { get; private set; }
+        public int MaxRegistrationCount { get; set; }
         [Display(Name = "Allow Standy Registrations")]
-        public bool AllowStandby { get; private set; }
+        public bool AllowStandby { get; set; }
         [Display(Name = "Max Standy Registrations"), 
             RequireIfRelatedFieldTrue("AllowStandby", ErrorMessage = "You must provide the maximum number of allowed standby registrations to allow standby")]
-        public uint MaxStandbyRegistrationCount { get; private set; }        
+        public int? MaxStandbyRegistrationCount { get; set; }        
         [Display(Name = "Street Address"), Required, StringLength(50)]
-        public string AddressLine1 { get; private set; }
+        public string AddressLine1 { get; set; }
         [Display(Name = "Ste/Apt/Room#"), StringLength(25)]
-        public string AddressLine2 { get; private set; }
+        public string AddressLine2 { get; set; }
         [Display(Name = "City"), Required, StringLength(50)]
-        public string City { get; private set; }
+        public string City { get; set; }
         [Display(Name = "State"), Required]
-        public string State { get; private set; }
+        public string State { get; set; }
         [Display(Name = "ZIP Code"), Required, StringLength(5)]
-        public string Zip { get; private set; }                
+        public string Zip { get; set; }                
         public SelectList EventTypes { get; set; }
         public SelectList States { get; set; }
         public SelectList EventSerieses { get; set; }
