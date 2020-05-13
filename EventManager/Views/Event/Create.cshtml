@@ -5,40 +5,19 @@
 @section scripts{ 
     <script type="text/javascript" src="~/lib/moment/moment.min.js"></script>
     <script type="text/javascript" src="~/lib/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="~/js/initClientsideValidation.js"></script>
+    <script type="text/javascript" src="~/js/markRequiredInputs.js"></script>
     <script type="text/javascript">
-        (function ($) {
-                var defaultOptions = {
-                    validClass: 'is-valid',
-                    errorClass: 'is-invalid',
-                    highlight: function (element, errorClass, validClass) {
-                        $(element)
-                            .removeClass(validClass)
-                            .addClass(errorClass);
-                    },
-                    unhighlight: function (element, errorClass, validClass) {
-                        $(element)
-                            .removeClass(errorClass)
-                            .addClass(validClass);
-                    }
-                };
-
-                $.validator.setDefaults(defaultOptions);
-
-                $.validator.unobtrusive.options = {
-                    errorClass: defaultOptions.errorClass,
-                    validClass: defaultOptions.validClass,
-                };
-            })(jQuery);
         $(document).ready(function () {
             $('#StartDate').datetimepicker();
             $('#EndDate').datetimepicker();
             $('#RegistrationOpenDate').datetimepicker();
             $('#RegistrationClosedDate').datetimepicker();
             $('input','form').blur(function () {
-                              $(this).valid();
+            $(this).valid();
             });
             $('textarea','form').blur(function () {
-                              $(this).valid();
+            $(this).valid();
                     });
         });
     </script>
