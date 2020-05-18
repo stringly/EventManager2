@@ -1,0 +1,41 @@
+﻿@model EventManager.Models.ViewModels.RankAddViewModel
+
+<div class="container">
+    <div class="row justify-content-md-center formContainer">
+        <div class='col-sm-12 col-lg-10'>
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
+                    <h2 class="formHeader-heading">Create a Rank</h2>
+                    <p class="formHeader-description">
+                        A Rank represents a title to which a User can be assigned. Provide the information below to create a new Rank.
+                    </p>
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                </div>
+            </div>
+            <hr />
+            <form asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label asp-for="Short" class="control-label"></label>
+                        <input asp-for="Short" class="form-control" />
+                        <span asp-validation-for="Short" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label asp-for="Long" class="control-label"></label>
+                        <input asp-for="Long" class="form-control" />
+                        <span asp-validation-for="Long" class="text-danger"></span>
+                    </div>
+                </div>
+                <hr />
+                <div class="row formControlRow">
+                    <div class="col-sm-4 form-group">
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-default">Cancel</a>
+                        <a asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl" class="btn btn-warning">Reset</a>
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

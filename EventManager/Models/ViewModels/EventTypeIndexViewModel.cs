@@ -8,12 +8,18 @@ namespace EventManager.Models.ViewModels
 {
     public class EventTypeIndexViewModel : IndexViewModel
     {
-        public EventTypeIndexViewModel(IEnumerable<EventType> eventTypes, string sortOrder, string searchString, int page = 1, int pageSize = 25)
+        public EventTypeIndexViewModel(
+            IEnumerable<EventType> eventTypes, 
+            string sortOrder, 
+            string searchString, 
+            int totalItems,
+            int page = 1, 
+            int pageSize = 25)
         {
             PagingInfo = new PagingInfo { 
                 ItemsPerPage = pageSize,
                 CurrentPage = page,
-                TotalItems = eventTypes.Count()
+                TotalItems = totalItems
             };
             CurrentSort = sortOrder;
             CurrentFilter = searchString;

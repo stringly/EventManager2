@@ -56,7 +56,8 @@
 #sidebar {
     min-width: 250px;
     max-width: 250px;
-    background: var(--clean);
+    background: rgb(82,101,143);
+    background: linear-gradient(356deg, rgba(82,101,143,0.35057773109243695) 0%, rgba(236,240,245,0.12368697478991597) 100%);
     color: var(--sunshine);
     transition: all 0.4s cubic-bezier(0.945, 0.020, 0.270, 0.665);
     transform-origin: bottom left;
@@ -150,7 +151,7 @@ a.article, a.article:hover {
     --fresh: #F7F5E6;
     --vermillion: #333A56;
     --sunshine: #52658F;
-    --clean: #E8E8E8;
+    --clean: #ecf0f5;
 }
 
 #content {

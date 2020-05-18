@@ -1,0 +1,149 @@
+﻿@model EventManager.Models.ViewModels.EventDetailsViewModel
+
+
+<div class="container">
+    <div class="row justify-content-center formContainer">
+        <div class="col-sm-12 col-lg-10">
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
+                    <h2 class="formHeader-heading">Event Details</h2>                    
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Title)</strong><br />
+                    <span>@Html.DisplayFor(model => model.Title)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.StartDate)</strong><br />
+                    <span>@Html.DisplayFor(model => model.StartDate)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.EndDate)</strong><br />
+                    <span>@Html.DisplayFor(model => model.EndDate)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Description)</strong><br />
+                    <p>@Model.Description</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.EventTypeName)</strong><br />
+                    <span>@Html.DisplayFor(model => model.EventTypeName)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.EventSeriesId)</strong><br />
+                    <span>
+                        @if (!String.IsNullOrEmpty(Model.EventSeriesName))
+                        {
+                            <a asp-action="Details" asp-controller="EventSeries" asp-route-id="@Model.EventSeriesId" asp-route-returnUrl="/Event/Details/@Model.Id@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")"> @Html.DisplayFor(model => model.EventSeriesName)</a>
+                        }
+                        else
+                        {
+                            @:Not part of an Event Series
+                        }
+                    </span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.FundCenter)</strong><br />
+                    <span>@Html.DisplayFor(model => model.FundCenter)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.RegistrationOpenDate)</strong><br />
+                    <span>@Html.DisplayFor(model => model.RegistrationOpenDate)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.RegistrationClosedDate)</strong><br />
+                    <span>@Html.DisplayFor(model => model.RegistrationClosedDate)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.MinRegistrationCount)</strong><br />
+                    <span>@Html.DisplayFor(model => model.MinRegistrationCount)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.MaxRegistrationCount)</strong><br />
+                    <span>@Html.DisplayFor(model => model.MaxRegistrationCount)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.AllowStandby)</strong><br />
+                    <span>@Html.DisplayFor(model => model.AllowStandby)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.MaxStandbyRegistrationCount)</strong><br />
+                    <span>@Html.DisplayFor(model => model.MaxStandbyRegistrationCount)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.AddressLine1)</strong><br />
+                    <span>@Html.DisplayFor(model => model.AddressLine1)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.AddressLine2)</strong><br />
+                    <span>@Html.DisplayFor(model => model.AddressLine2)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.City)</strong><br />
+                    <span>@Html.DisplayFor(model => model.City)</span>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.State)</strong><br />
+                    <span>@Html.DisplayFor(model => model.State)</span>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Zip)</strong><br />
+                    <span>@Html.DisplayFor(model => model.Zip)</span>
+                </div>
+            </div>
+            <hr />
+            @if (Model.TotalRegistrations > 0)
+            {
+                <h6>Registration Information</h6>
+                <div class="row">
+                    <div class="col-auto">
+                        <strong>@Html.DisplayNameFor(model => model.TotalRegistrations)</strong><br />
+                        <span>@Html.DisplayFor(model => model.TotalRegistrations)</span>
+                    </div>
+                    <div class="col-auto">
+                        <strong>@Html.DisplayNameFor(model => model.AcceptedRegistrations)</strong><br />
+                        <span>@Html.DisplayFor(model => model.AcceptedRegistrations)</span>
+                    </div>
+                    <div class="col-auto">
+                        <strong>@Html.DisplayNameFor(model => model.PendingRegistrations)</strong><br />
+                        <span>@Html.DisplayFor(model => model.PendingRegistrations)</span>
+                    </div>
+                    <div class="col-auto">
+                        <strong>@Html.DisplayNameFor(model => model.StandbyRegistrations)</strong><br />
+                        <span>@Html.DisplayFor(model => model.StandbyRegistrations)</span>
+                    </div>
+                    <div class="col-auto">
+                        <strong>@Html.DisplayNameFor(model => model.RejectedRegistrations)</strong><br />
+                        <span>@Html.DisplayFor(model => model.RejectedRegistrations)</span>
+                    </div>
+                </div>
+                <a asp-action="RegistrationDetails" asp-controller="Event" asp-route-id="@Model.Id" asp-route-returnUrl="/Event/Details/@Model.Id@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">Manage Registrations for this Event</a>
+                <hr />
+            }
+            <div class="row formControlRow">
+                <div class="col-sm-12">
+                    <a href="@ViewBag.ReturnUrl" class="btn btn-default">Cancel</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" asp-route-returnUrl="/Event/Details/@Model.Id@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" class="btn btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" asp-route-returnUrl="/Event/Details/@Model.Id@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" class="btn btn-danger">Delete</a>
+                </div>
+            </div>           
+        </div>
+    </div>
+</div>
+
+

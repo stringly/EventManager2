@@ -8,24 +8,13 @@ using System.Threading.Tasks;
 
 namespace EventManager.Models.Domain
 {
-    public class Rank 
+    public class Rank : IEntity
     {
         private Rank() { }
         public Rank(string abbreviation, string fullName)
         {
-            if (string.IsNullOrWhiteSpace(abbreviation))
-            {
-                throw new ArgumentException("Rank Abbreviation cannot be empty string", nameof(abbreviation));
-            }
-            else if (string.IsNullOrWhiteSpace(fullName))
-            {
-                throw new ArgumentException("Rank Full Name cannot be empty string", nameof(fullName));
-            }
-            else
-            {
-                Short = abbreviation;
-                Full = fullName;
-            }
+            UpdateAbbreviation(abbreviation);
+            UpdateFullName(fullName);
             _users = new List<User>();
         }
         public int Id { get; private set; }
@@ -57,6 +46,22 @@ namespace EventManager.Models.Domain
                     return "Mr./Ms.";
                 }
             }
+        }
+        public void UpdateAbbreviation(string newAbbrev)
+        {
+            if (string.IsNullOrWhiteSpace(newAbbrev))
+            {
+                throw new ArgumentException("Cannot update Rank Short Name to empty string.", nameof(newAbbrev));
+            }
+            Short = newAbbrev;
+        }
+        public void UpdateFullName(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                throw new ArgumentException("Cannot update Rank Short Name to empty string.", nameof(newName));
+            }
+            Full = newName;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using EventManager.Data.Core.Repositories;
+﻿using EventManager.Data.Core;
+using EventManager.Data.Core.Repositories;
+using EventManager.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EventManager.Data.Persistence.Repositories
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         protected readonly DbContext context;
         public Repository(DbContext context)
@@ -39,6 +41,26 @@ namespace EventManager.Data.Persistence.Repositories
         public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await context.Set<TEntity>().Where(predicate).ToListAsync();
+        }
+        public bool Exists(int id)
+        {
+            return context.Set<TEntity>().Any(x => x.Id == id);
+        }
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await context.Set<TEntity>().AnyAsync(x => x.Id == id);
+        }
+        public int Count()
+        {
+            return context.Set<TEntity>().Count();
+        }
+        public int CountByExpression(Expression<Func<TEntity, bool>> predicate)
+        {
+            return context.Set<TEntity>().Where(predicate).Count();
+        }
+        public bool ValueIsInUseByIdForExpression(Expression<Func<TEntity, bool>> predicate)
+        {
+            return context.Set<TEntity>().Where(predicate).Any();
         }
         public bool Any()
         {
@@ -73,5 +95,7 @@ namespace EventManager.Data.Persistence.Repositories
         {
             context.Set<TEntity>().RemoveRange(entities);
         }
+
+
     }
 }

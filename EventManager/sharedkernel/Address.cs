@@ -60,5 +60,9 @@ namespace EventManager.sharedkernel
         {
             return !(x == y);
         }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

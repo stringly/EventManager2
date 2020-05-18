@@ -1,5 +1,6 @@
 ﻿using EventManager.Data.Core;
 using EventManager.Data.Core.Repositories;
+using EventManager.Data.Core.Services;
 using EventManager.Data.Persistence;
 using EventManager.Models.Domain;
 using System.Collections.Generic;
@@ -7,21 +8,26 @@ using System.Linq;
 
 namespace EventManager.Data
 {
-    public static class DataInitializer
+    public class DataInitializer
     {
-        private static IUnitOfWork _unitOfWork;
-        public static void SeedData(IUnitOfWork unitOfWork)
+        private readonly EventManagerContext _context;
+        
+        public DataInitializer(EventManagerContext context)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
+        }
+        public void SeedData()
+        {
+            
             SeedUserRanks();
-            unitOfWork.Complete();
+            _context.SaveChanges();
             SeedAdminUser();
             SeedEventTypes();
-            unitOfWork.Complete();
+            _context.SaveChanges();
         }
-        public static void SeedUserRanks()
+        public void SeedUserRanks()
         {
-            bool ranksPresent = _unitOfWork.Ranks.Any();
+            bool ranksPresent = _context.Ranks.Any();
             if (!ranksPresent)
             {
                 List<Rank> ranks = new List<Rank>()
@@ -42,15 +48,15 @@ namespace EventManager.Data
                     new Rank("A/Maj.", "Acting Major"),
                     new Rank("A/DC", "Acting Deputy Chief")
                 };
-                _unitOfWork.Ranks.AddRange(ranks);
+                _context.Ranks.AddRange(ranks);
             }
         }
-        public static void SeedAdminUser()
+        public void SeedAdminUser()
         {
-            bool usersPresent = _unitOfWork.Users.Any();
+            bool usersPresent = _context.Users.Any();
             if (!usersPresent)
             {
-                Rank adminUserRank = _unitOfWork.Ranks.GetRankByFullName("Lieutenant");
+                Rank adminUserRank = _context.Ranks.Where(x => x.Full == "Lieutenant").FirstOrDefault();
                 if (adminUserRank == null)
                 {
                     throw new KeyNotFoundException("Admin rank Lieutenant does not match any rank in the context.");
@@ -61,13 +67,13 @@ namespace EventManager.Data
                     new User("jcsmith1", 1, "Jason","Smith","3134", "jcsmith1@co.pg.md.us", "3016483444", adminUserRank)
 
                 };
-                _unitOfWork.Users.AddRange(admins);
+                _context.Users.AddRange(admins);
             }
         }
 
-        public static void SeedEventTypes()
+        public void SeedEventTypes()
         {
-            bool eventTypesPresent = _unitOfWork.EventTypes.Any();
+            bool eventTypesPresent = _context.EventTypes.Any();
             if (!eventTypesPresent)
             {
                 List<EventType> eventTypes = new List<EventType>()
@@ -77,7 +83,7 @@ namespace EventManager.Data
                     new EventType("Special Assignment"),
                     new EventType("Meeting") 
                 };
-                _unitOfWork.EventTypes.AddRange(eventTypes);
+                _context.EventTypes.AddRange(eventTypes);
             }
         }
     }

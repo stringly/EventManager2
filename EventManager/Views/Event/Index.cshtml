@@ -16,7 +16,7 @@
             <div class="form-row align-items-top">
                 <div class="col-auto mb-2">
                     <select asp-for="SelectedUserId" class="form-control form-control-sm" asp-items="Model.Users">
-                        <option value="">No User Filter</option>
+                        <option value="0">No User Filter</option>
                     </select>
                 </div>
                 <div class="col-auto mb-2">
@@ -43,37 +43,39 @@
                 </div>*@
             <div class="col-auto mb-2">
                 <button type="submit" class="btn btn-sm btn-default" id="filterSubmit"><i class="fas fa-search"></i> Search</button>
-                @*@if (!String.IsNullOrEmpty(Model.CurrentFilter) || (Model.StartDate != null && Model.EndDate != null) || !String.IsNullOrEmpty(Model.UserId) || Model.WorksiteId != 0)*@
                     @if (!String.IsNullOrEmpty(Model.CurrentFilter) || Model.SelectedUserId != 0 || Model.SelectedEventTypeId != 0)
                     {
                         <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="Event"><i class="fas fa-arrow-left"></i> Back to Full List</a>
                     }
                 </div>
             </div>
-
         </form>
         <div class="table-responsive-sm">
             <table class="table table-striped table-sm table-light indexTable">
                 <thead>
                     <tr class="tablePageControlHeaderRow">
-                        <th colspan="7">
+                        <th colspan="8">
                             <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
                                  page-class="" page-class-normal=""
                                  page-class-selected="active"
                                  page-url-searchString="@Model.CurrentFilter"
                                  page-url-sortOrder="@Model.CurrentSort"
                                  page-url-UserId="@Model.SelectedUserId"
-                                 @*page-url-startDate="@Model.StartDate"
-                                 page-url-endDate="@Model.EndDate"*@
                                  page-url-EventTypeId="@Model.SelectedEventTypeId"
                                  class="btn-group">
                             </div>
                         </th>
                     </tr>
                     <tr>
+                        <th colspan="8">
+                            @Model.PagingInfo.TotalItems Events Found
+                        </th>
+                    </tr>
+                    <tr>
                         <th>
                             EventId
                         </th>
+                        <th>Title</th>
                         <th>
                             <a asp-page="/Index" title="Sort by Event Type"
                                asp-route-sortOrder="@Model.EventTypeSort"
@@ -133,7 +135,7 @@
                                asp-route-sortOrder="@Model.UserIdSort"
                                asp-route-searchString="@Model.CurrentFilter"
                                asp-route-UserId="@Model.SelectedUserId"                               
-                               asp-route-WorkSiteId="@Model.SelectedEventTypeId">
+                               asp-route-EventTypeId="@Model.SelectedEventTypeId">
                                 Creator
                                 @if (Model.CurrentSort == "userId_desc")
                                 {
@@ -157,13 +159,23 @@
                         {
                             <tr>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@e.EventId" asp-controller="Event" asp-route-returnUrl="/Event/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@e.EventId</a>
+                                    @e.EventId
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@e.EventId" asp-controller="Event" asp-route-returnUrl="/Event/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@e.EventTitle</a>
                                 </td>
                                 <td>
                                     @e.EventTypeName
                                 </td>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@e.EventSeriesId" asp-controller="EventSeries" asp-route-returnUrl="/Event/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@e.EventSeriesTitle</a>
+                                    @if (e.EventSeriesId != 0)
+                                    {
+                                        <a asp-action="Details" asp-route-id="@e.EventSeriesId" asp-controller="EventSeries" asp-route-returnUrl="/Event/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@e.EventSeriesTitle</a>
+                                    }
+                                    else
+                                    {
+                                        @e.EventSeriesTitle
+                                    }
                                 </td>
                                 <td>
                                     @e.StartDate
@@ -191,7 +203,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center">No matching Events were found.</td>
+                            <td colspan="8" class="text-center">No matching Events were found.</td>
                         </tr>
                     }
                 </tbody>

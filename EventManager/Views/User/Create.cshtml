@@ -1,0 +1,77 @@
+﻿@model EventManager.Models.ViewModels.UserAddViewModel
+
+<div class="container">
+    <div class="row justify-content-md-center formContainer">
+        <div class='col-sm-12 col-lg-10'>
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
+                    <h2 class="formHeader-heading">Create a User</h2>
+                    <p class="formHeader-description">
+                        Provide the information below to create a new User.
+                    </p>
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                </div>
+            </div>
+            <hr />
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-sm-4 form-group">
+                        <label asp-for="RankId" class="control-label"></label>
+                        <select asp-for="RankId" asp-items="@Model.Ranks" class="form-control"></select>
+                        <span asp-validation-for="RankId" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="FirstName" class="control-label"></label>
+                        <input type="text" asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="LastName" class="control-label"></label>
+                        <input type="text" asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input type="text" asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="LDAPName" class="control-label"></label>
+                        <input type="text" asp-for="LDAPName" class="form-control" />
+                        <span asp-validation-for="LDAPName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="ContactNumber" class="control-label"></label>
+                        <input asp-for="ContactNumber" class="form-control" />
+                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="IdNumber" class="control-label"></label>
+                        <input type="text" asp-for="IdNumber" class="form-control" />
+                        <span asp-validation-for="IdNumber" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label asp-for="BlueDeckId" class="control-label"></label>
+                        <input asp-for="BlueDeckId" class="form-control" />
+                        <span asp-validation-for="BlueDeckId" class="text-danger"></span>
+                    </div>                    
+                </div>                
+                <hr />
+                <div class="row formControlRow">
+                    <div class="col-sm-12 form-group">
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-default">Cancel</a>
+                        <a asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl" class="btn btn-warning">Reset</a>
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+

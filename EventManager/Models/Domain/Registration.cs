@@ -2,7 +2,7 @@
 
 namespace EventManager.Models.Domain
 {
-    public class Registration
+    public class Registration : IEntity
     {
         private Registration() { }
         public Registration(User u, Event e, RegistrationStatus status){
@@ -23,7 +23,7 @@ namespace EventManager.Models.Domain
                 EventId = e.Id;
                 Status = status;
             }
-        }
+        }       
         public int Id { get; private set; }
         public DateTime TimeStamp { get; private set; }
         public int? UserId { get; private set; }

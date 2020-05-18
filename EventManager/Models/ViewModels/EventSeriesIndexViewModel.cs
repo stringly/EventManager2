@@ -13,6 +13,7 @@ namespace EventManager.Models.ViewModels
             IEnumerable<EventSeries> eventSeries, 
             string sortOrder, 
             string searchString, 
+            int totalItems,
             int page, 
             int pageSize = 25
             )
@@ -20,7 +21,7 @@ namespace EventManager.Models.ViewModels
             PagingInfo = new PagingInfo { 
                 ItemsPerPage = pageSize, 
                 CurrentPage = page,
-                TotalItems = eventSeries.Count()
+                TotalItems = totalItems
             };
             EventSeriesItems = eventSeries
                 .ToList()

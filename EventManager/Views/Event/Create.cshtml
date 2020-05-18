@@ -23,16 +23,18 @@
     </script>
 }
 <div class="container">
-    <div class="row justify-content-md-center">
-        <div class='col-sm-auto col-lg-10'>
-            <div class="row">
+    <div class="row justify-content-md-center formContainer">
+        <div class='col-sm-12 col-lg-10'>
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
                     <h2 class="formHeader-heading">Create an Event</h2>
                     <p class="formHeader-description">
                         Provide the information below to create an Event and allow users to Register.
                     </p>
                     <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
-                <hr />
-            </div>            
+                </div>                
+            </div>
+            <hr />
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="row">
@@ -67,7 +69,9 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label asp-for="EventSeriesId" class="control-label"></label>
-                            <select asp-for="EventSeriesId" asp-items="@Model.EventSerieses" class="form-control"></select>
+                            <select asp-for="EventSeriesId" asp-items="@Model.EventSerieses" class="form-control">
+                                <option value="">No Event Series</option>
+                            </select>                                
                             <span asp-validation-for="EventSeriesId" class="text-danger"></span>
                         </div>
                         <div class="col-sm-4 form-group">
@@ -144,8 +148,11 @@
                             <span asp-validation-for="Zip" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-4 form-group">
+                    <hr />
+                    <div class="row formControlRow">
+                        <div class="col-sm-12 form-group">
+                            <a href="@ViewBag.ReturnUrl" class="btn btn-default">Cancel</a>
+                            <a asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl" class="btn btn-warning">Reset</a>
                             <input type="submit" value="Create" class="btn btn-primary" />
                         </div>
                     </div>

@@ -1,0 +1,38 @@
+﻿@model EventManager.Models.ViewModels.EventTypeAddViewModel
+
+<div class="container">
+    <div class="row justify-content-md-center formContainer">
+        <div class='col-sm-12 col-lg-10'>
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
+                    <h2 class="formHeader-heading">Create an Event Type</h2>
+                    <p class="formHeader-description">
+                        An Event Type is a category to which an Event can be assigned. Provide a title to create a new Event Type.
+                    </p>
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                </div>
+            </div>
+            <hr />
+            <form asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label asp-for="EventTypeName" class="control-label"></label>
+                        <input asp-for="EventTypeName" class="form-control" />
+                        <span asp-validation-for="EventTypeName" class="text-danger"></span>
+                    </div>
+                </div>
+                <hr />
+                <div class="row formControlRow">
+                    <div class="col-sm-12 form-group">
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-default">Cancel</a>
+                        <a asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl" class="btn btn-warning">Reset</a>
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+

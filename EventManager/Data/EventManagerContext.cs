@@ -21,6 +21,11 @@ namespace EventManager.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
+            var navigation5 = builder.Entity<Rank>()
+                .Metadata.FindNavigation(nameof(Rank.Users));
+            navigation5.SetPropertyAccessMode(PropertyAccessMode.Field);
+
             // property magic string shadow property
             builder.Entity<Event>()
                 .Property(x => x.Title)
@@ -80,11 +85,9 @@ namespace EventManager.Data
                 .Metadata.FindNavigation(nameof(EventType.Events));
             navigation4.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            var navigation5 = builder.Entity<Rank>()
-                .Metadata.FindNavigation(nameof(Rank.Users));
-            navigation5.SetPropertyAccessMode(PropertyAccessMode.Field);
 
 
+            
 
             base.OnModelCreating(builder);
         }

@@ -82,7 +82,7 @@ namespace EventManager.Models.ViewModels
             MustBeBeforeDate("StartDate", ErrorMessage = "Registration period Start Date cannot be after the Event's Start Date"), 
             MustBeAfterDate("RegistrationOpenDate", ErrorMessage = "Registration Period End Date cannot be before the Registration Period End Date")]
         public DateTime RegistrationClosedDate { get; set; }
-        [Display(Name = "Min Registrations")]
+        [Display(Name = "Min Registrations"), NumberMustBeLessThanNumber("MaxRegistrationCount", ErrorMessage = "Min Registrations must be less than Max Registrations")]
         public int? MinRegistrationCount { get; set; }
         [Display(Name = "Max Registrations")]
         public int MaxRegistrationCount { get; set; }

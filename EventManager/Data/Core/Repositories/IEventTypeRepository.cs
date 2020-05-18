@@ -9,7 +9,10 @@ namespace EventManager.Data.Core.Repositories
 {
     public interface IEventTypeRepository : IRepository<EventType>
     {
-        Task<IEnumerable<EventType>> GetEventTypesWithEventsAsync(int filterByEventTypeId = 0, int page = 1, int pageSize = 25);
+        Task<IEnumerable<EventType>> GetEventTypesWithEventsAsync(string searchString = "", int page = 1, int pageSize = 25);
+        Task<EventType> GetEventTypeWithEventsAsync(int id);
+        EventType GetEventTypeWithEvents(int id);        
         SelectList GetEventTypeSelectList();
+        Task<SelectList> GetEventTypeSelectListAsync();
     }
 }

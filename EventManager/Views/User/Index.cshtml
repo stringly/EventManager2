@@ -45,8 +45,16 @@
                         </th>
                     </tr>
                     <tr>
+                        <th colspan="10">
+                            @Model.PagingInfo.TotalItems Users Found
+                        </th>
+                    </tr>
+                    <tr>
                         <th>
                             UserId
+                        </th>
+                        <th>
+                            LDAP Name
                         </th>
                         <th>
                             BlueDeckId
@@ -106,9 +114,6 @@
                             Email
                         </th>
                         <th>
-                            LDAP Name
-                        </th>
-                        <th>
                             Contact
                         </th>
                         <th>
@@ -121,46 +126,47 @@
                     {
                         foreach (UserIndexViewModelUserItem u in Model.Users)
                         {
-                            <tr>
-                                <td>
-                                    <a asp-action="Details" asp-controller="User" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@u.UserId</a>
-                                </td>
-                                <td>
-                                    @u.BlueDeckId
-                                </td>
-                                <td>
-                                    @u.LastName
-                                </td>
-                                <td>
-                                    @u.FirstName
-                                </td>
-                                <td>
-                                    @u.IdNumber
-                                </td>
-                                <td>
-                                    @u.Rank
-                                </td>
-                                <td>
-                                    @u.Email
-                                </td>
-                                <td>
-                                    @u.LDAPName
-                                </td>
-                                <td>
-                                    @u.Phone
-                                </td>
-                                <td class="text-right">
-                                    <a asp-action="Details" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Edit User" class="glyphicon-ring">
-                                        <i class="fas fa-pen-square"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Delete User" class="glyphicon-ring">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                    <tr>
+                        <td>
+                            @u.UserId
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-controller="User" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@u.LDAPName</a>                            
+                        </td>
+                        <td>
+                            @u.BlueDeckId
+                        </td>
+                        <td>
+                            @u.LastName
+                        </td>
+                        <td>
+                            @u.FirstName
+                        </td>
+                        <td>
+                            @u.IdNumber
+                        </td>
+                        <td>
+                            @u.Rank
+                        </td>
+                        <td>
+                            @u.Email
+                        </td>
+
+                        <td>
+                            @u.Phone
+                        </td>
+                        <td class="text-right">
+                            <a asp-action="Details" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="View Details" class="glyphicon-ring">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Edit User" class="glyphicon-ring">
+                                <i class="fas fa-pen-square"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@u.UserId" asp-route-returnUrl="/User/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" title="Delete User" class="glyphicon-ring">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
                         }
                     }
                     else

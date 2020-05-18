@@ -39,6 +39,11 @@
                         </th>
                     </tr>
                     <tr>
+                        <th colspan="5">
+                            @Model.PagingInfo.TotalItems Ranks Found
+                        </th>
+                    </tr>
+                    <tr>
                         <th>
                             <a asp-page="/Index" title="Sort by Rank Id"
                                asp-route-sortOrder="@Model.RankIdSort"
@@ -87,10 +92,10 @@
                         {
                             <tr>
                                 <td>
-                                    <a asp-action="Details" asp-controller="Rank">@r.RankId</a>
+                                    @r.RankId
                                 </td>
                                 <td>
-                                    @r.RankFullName
+                                    <a asp-action="Details" asp-route-id="@r.RankId" asp-route-returnUrl="/Rank/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" asp-controller="Rank">@r.RankFullName</a>                                    
                                 </td>
                                 <td>
                                     @r.Abbreviation

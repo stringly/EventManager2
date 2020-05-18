@@ -6,30 +6,19 @@ using System.Linq;
 
 namespace EventManager.Models.Domain
 {
-    public class EventSeries
+    public class EventSeries : IEntity
     {
         private EventSeries() { }
         public EventSeries(string title, string description)
         {
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                throw new ArgumentException("Event series title cannot be empty string", nameof(title));
-            }
-            else if (string.IsNullOrWhiteSpace(description))
-            {
-                throw new ArgumentException("Event series description cannot be empty string", nameof(description));
-            }
-            else
-            {
-                Title = title;
-                Description = description;
-            }
+            UpdateTitle(title);
+            UpdateDescription(description);
             _events = new List<Event>();
         }
         
-        public int Id { get; set; }
-        public string Title { get;set;}
-        public string Description { get; set;}
+        public int Id { get; private set; }
+        public string Title { get; private set;}
+        public string Description { get; private set;}
         private ICollection<Event> _events;
         public IEnumerable<Event> Events => _events.ToList();
 
@@ -63,37 +52,46 @@ namespace EventManager.Models.Domain
             }
             else
             {
-                _events.Add(e);
+                e.AddEventToSeries(this);
             }
         }
         public void RemoveEventFromSeries(Event e)
         {
             if (e == null)
             {
-                _events.Remove(e);
+                e.RemoveEventFromSeries();
             }
         }
         public void AddEventRangeToSeries(IEnumerable<Event> events)
         {
             foreach (Event e in events)
             {
-                AddEventToSeries(e);
+                e.AddEventToSeries(this);
             }            
         }
         public void RemoveEventRangeFromSeries(IEnumerable<Event> events)
         {
             foreach (Event e in events)
             {
-                RemoveEventFromSeries(e);
+                e.RemoveEventFromSeries();
             }
         }
         public IEnumerable<Event> GetAvailableEvents()
         {
-            return Events?.Where(x => x.IsAcceptingRegistrations() == true).ToList() ?? new List<Event>();
+            EnsureEventsLoaded();
+            return Events.Where(x => x.IsAcceptingRegistrations() == true).ToList();
         }
         public bool HasAvailableEvents()
         {
-            return Events?.Any(x => x.IsAcceptingRegistrations() == true) ?? false;
+            EnsureEventsLoaded();
+            return Events.Any(x => x.IsAcceptingRegistrations() == true);
+        }
+        private void EnsureEventsLoaded()
+        {
+            if (Events == null)
+            {
+                throw new NullReferenceException("Event Series has null Events collection.");
+            }
         }
     }
 }

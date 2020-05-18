@@ -11,9 +11,16 @@ namespace EventManager.Data.Core.Repositories
     {
         Task<User> GetUserByLDAPNameAsync(string LDAPName);
         User GetUserByLDAPName(string LDAPName);
-        Task<IEnumerable<User>> GetUsersWithRankAsync(int selectedRankId = 0, int page = 1, int pageSize = 25);
-        IEnumerable<User> GetUsersWithRank(int selectedRankId = 0, int page = 1, int pageSize = 25);
+        Task<IEnumerable<User>> GetUsersWithRankAsync(string searchString = "", int selectedRankId = 0, int page = 1, int pageSize = 25);
+        IEnumerable<User> GetUsersWithRank(string searchString = "", int selectedRankId = 0, int page = 1, int pageSize = 25);
         Task<IEnumerable<User>> GetUsersWithRegistrationsAsync();
+        Task<IEnumerable<User>> GetUsersByRankIdAsync(int rankId);
+        IEnumerable<User> GetUsersByRankId(int rankId);
+        Task<int> GetCountOfUsersInRankByRankIdAsync(int rankId);
+        int GetCountOfUsersInRankByRankId(int rankId);
+        Task<User> GetUserWithOwnedEventsAndRegistrationsAsync(int id);
+        User GetUserWithOwnedEventsAndRegistrations(int id);
         SelectList GetUserSelectList();
+        Task<SelectList> GetUserSelectListAsync();
     }
 }

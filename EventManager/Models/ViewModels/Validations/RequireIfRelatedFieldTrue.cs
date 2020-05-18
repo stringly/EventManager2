@@ -17,13 +17,15 @@ namespace EventManager.Models.ViewModels.Validations
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value == null)
-            {
-                return ValidationResult.Success;
-            }
-
             ErrorMessage = ErrorMessageString;
-            var currentValue = (int)value;
+            // this is a change to handle an int? type on the attribute field
+            // some VM fields will have int? type to prevent the validator from
+            // flagging them as required if they are optional or conditionally optional.
+            var currentValue = 0;
+            if (value != null)
+            {
+                currentValue = (int)value;
+            }
 
             var property = validationContext.ObjectType.GetProperty(_comparisonProperty);
 

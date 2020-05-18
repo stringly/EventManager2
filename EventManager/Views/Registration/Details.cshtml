@@ -1,0 +1,59 @@
+﻿@model EventManager.Models.ViewModels.RegistrationDetailsViewModel
+
+
+<div class="container">
+    <div class="row justify-content-center formContainer">
+        <div class="col-sm-12 col-lg-10">
+            <div class="row formHeaderRow">
+                <div class="col-sm-12">
+                    <h2 class="formHeader-heading">Registration Details</h2>
+                    <a asp-action="Index"><i class="ion-md-arrow-round-back"></i> Back to List</a>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.TimeStamp)</strong><br />
+                    <span>@Html.DisplayFor(model => model.TimeStamp)</span>
+                </div>
+                <div class="col-sm-3 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Status)</strong><br />
+                    <span>@Html.DisplayFor(model => model.Status)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.EventName)</strong><br />
+                    <a asp-action="Details" asp-controller="Event" asp-route-id="@Model.EventId" asp-route-returnUrl="/Registration/Details/@Model.RegistrationId@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@Html.DisplayFor(model => model.EventName)</a>
+                </div>
+                <div>
+                    <strong>@Html.DisplayNameFor(model => model.EventDate)</strong><br />
+                    <span>@Html.DisplayFor(model => model.EventDate)</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.UserName)</strong><br />
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@Model.UserId" asp-route-returnUrl="/Registration/Details/@Model.RegistrationId@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@Html.DisplayFor(model => model.UserName)</a>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Email)</strong><br />
+                    <a href="mailto:@Model.Email">@Html.DisplayFor(model => model.Email)</a>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <strong>@Html.DisplayNameFor(model => model.Phone)</strong><br />
+                    <a href="mailto:@Model.Email">@Html.DisplayFor(model => model.Phone)</a>
+                </div>
+            </div>
+            <hr />
+            <div class="row formControlRow">
+                <div class="col-sm-12">
+                    <a href="@ViewBag.ReturnUrl" class="btn btn-sm btn-default">Cancel</a>
+                    <a asp-action="Delete" asp-route-id="@Model.RegistrationId" asp-route-returnUrl="/Registration/Details/@Model.RegistrationId@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

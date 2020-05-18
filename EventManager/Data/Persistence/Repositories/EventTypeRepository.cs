@@ -19,18 +19,44 @@ namespace EventManager.Data.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<EventType>> GetEventTypesWithEventsAsync(int filterByEventTypeId = 0, int page = 1, int pageSize = 25)
+        public async Task<IEnumerable<EventType>> GetEventTypesWithEventsAsync(string searchString = "", int page = 1, int pageSize = 25)
         {
             return await EventManagerContext.EventTypes
-                .Where(x => (filterByEventTypeId == 0 || x.Id == filterByEventTypeId))
+                .Where(x => (string.IsNullOrEmpty(searchString) || x.EventTypeName.ToLower().Contains(searchString)))
                 .Skip((page-1) * pageSize)
                 .Take(pageSize)
                 .Include(x => x.Events)
                 .ToListAsync();
         }
+        public async Task<EventType> GetEventTypeWithEventsAsync(int id)
+        {
+            return await EventManagerContext.EventTypes
+                .Include(x => x.Events)
+                    .ThenInclude(x => x.Owner)
+                        .ThenInclude(x => x.Rank)
+                .Include(x => x.Events)
+                    .ThenInclude(x => x.Registrations)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public EventType GetEventTypeWithEvents(int id)
+        {
+            return EventManagerContext.EventTypes
+                .Include(x => x.Events)
+                    .ThenInclude(x => x.Owner)
+                        .ThenInclude(x => x.Rank)
+                .Include(x => x.Events)
+                    .ThenInclude(x => x.Registrations)
+                .FirstOrDefault(x => x.Id == id);
+        }
+        
         public SelectList GetEventTypeSelectList()
         {
             return new SelectList(EventManagerContext.EventTypes, nameof(EventType.Id), nameof(EventType.EventTypeName));
+        }
+        public async Task<SelectList> GetEventTypeSelectListAsync()
+        {
+            return new SelectList(await EventManagerContext.EventTypes.ToListAsync(), nameof(EventType.Id), nameof(EventType.EventTypeName));
         }
     }
 }

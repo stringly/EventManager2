@@ -14,36 +14,8 @@
                 </div>
             </div>
             <div class="form-row align-items-top">
-                @*<div class="col-auto mb-2">
-                    <select asp-for="SelectedUserId" class="form-control form-control-sm" asp-items="Model.Users">
-                        <option value="">No User Filter</option>
-                    </select>
-                </div>
-                <div class="col-auto mb-2">
-                    <select asp-for="SelectedEventTypeId" class="form-control form-control-sm" asp-items="Model.EventTypes">
-                        <option value="0">No Event Type Filter</option>
-                    </select>
-                </div>
-                <div class="col-auto mb-2">
-                        <div class="form-row">
-                            <div class="col-auto mb-2">
-                                <input type="text" asp-for="StartDate" class="form-control form-control-sm" placeholder="Start Date" />
-                            </div>
-                            <div class="col-auto mb-2">
-                                <input type="text" asp-for="EndDate" class="form-control form-control-sm" placeholder="End Date" />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="col-12 mb-2 text-right">
-                                <small class="text-muted">Set Dates to Pay Period: </small>
-                                <button type="button" class="btn btn-sm btn-success" id="currentPayPeriodButton" data-startdate="@Model.PayPeriodStartDate" data-enddate="@Model.PayPeriodEndDate">Current</button>
-                                <button type="button" class="btn btn-sm btn-success" id="previousPayPeriodButton" data-startdate="@Model.PreviousPayPeriodStartDate" data-enddate="@Model.PreviousPayPeriodEndDate">Previous</button>
-                            </div>
-                        </div>
-                    </div>*@
                 <div class="col-auto mb-2">
                     <button type="submit" class="btn btn-sm btn-default" id="filterSubmit"><i class="fas fa-search"></i> Search</button>
-                    @*@if (!String.IsNullOrEmpty(Model.CurrentFilter) || (Model.StartDate != null && Model.EndDate != null) || !String.IsNullOrEmpty(Model.UserId) || Model.WorksiteId != 0)*@
                     @if (!String.IsNullOrEmpty(Model.CurrentFilter))
                     {
                         <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="EventSeries"><i class="fas fa-arrow-left"></i> Back to Full List</a>
@@ -64,6 +36,11 @@
                                  page-url-sortOrder="@Model.CurrentSort"
                                  class="btn-group">
                             </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="4">
+                            @Model.PagingInfo.TotalItems Event Series Found
                         </th>
                     </tr>
                     <tr>
@@ -97,10 +74,10 @@
                                 }
                             </a>
                         </th>
-                        <th>
+                        <th class="text-center">
                             Number of Events
                         </th>
-                        
+
                         <th>
 
                         </th>
@@ -113,12 +90,12 @@
                         {
                             <tr>
                                 <td>
-                                    <a asp-action="Details" asp-controller="Event">@e.EventSeriesId</a>
+                                    @e.EventSeriesId
                                 </td>
                                 <td>
-                                    <a asp-action="Details" asp-controller="EventSeries">@e.EventSeriesTitle</a>
+                                    <a asp-action="Details" asp-controller="EventSeries" asp-route-id="@e.EventSeriesId" asp-route-returnUrl="/EventSeries/Index@(!String.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? $"{Context.Request.QueryString}" : "")">@e.EventSeriesTitle</a>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @e.EventSeriesEventCount
                                 </td>
                                 <td class="text-right">

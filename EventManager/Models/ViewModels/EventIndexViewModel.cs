@@ -19,6 +19,7 @@ namespace EventManager.Models.ViewModels
             int selectedEventTypeId,
             string sortOrder,
             string searchString,
+            int totalItems = 0,
             int page = 1,
             int pageSize = 25)
         {
@@ -26,7 +27,7 @@ namespace EventManager.Models.ViewModels
             PagingInfo = new PagingInfo {
                 CurrentPage = page,
                 ItemsPerPage = pageSize,
-                TotalItems = events.Count()
+                TotalItems = totalItems
             };
             Events = events.ToList().ConvertAll(x => new EventIndexViewModelEventItem(x));
             Users = users;
@@ -36,7 +37,7 @@ namespace EventManager.Models.ViewModels
             CurrentSort = sortOrder;
             CurrentFilter = searchString;
             ApplySort(sortOrder);
-            ApplyFilter(searchString);
+            //ApplyFilter(searchString);
         }
 
 
@@ -122,6 +123,7 @@ namespace EventManager.Models.ViewModels
         public string CreatedByUserEmail { get; private set; }
         public string EventTypeName { get; private set; }
         public int CreatedByUserId { get; private set; }
+        public string Status { get; private set;}
         public EventIndexViewModelEventItem(Event e)
         {
             EventId = e.Id;            
@@ -133,6 +135,15 @@ namespace EventManager.Models.ViewModels
             CreatedByUserEmail = e?.Owner?.Email ?? "-";
             EventTypeName = e.EventTypeName;
             CreatedByUserId = e?.Owner?.Id ?? 0;
+            EventSeriesId = e?.EventSeriesId ?? 0;
+            if (e?.Registrations == null)
+            {
+                Status = "Registrations not loaded";
+            }
+            else
+            {
+                Status = e.GetEventStatus();
+            }
         }
     }
 }

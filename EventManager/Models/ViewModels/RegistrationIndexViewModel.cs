@@ -13,13 +13,14 @@ namespace EventManager.Models.ViewModels
         private RegistrationIndexViewModel() { }
         public RegistrationIndexViewModel(
         IEnumerable<Registration> registrations,
-        SelectList users, SelectList events,
-        SelectList eventTypes,
+        SelectList users, 
+        SelectList events,  
+        SelectList regStatuses,
         int selectedUserId,
         int selectedEventId,
-        int selectedEventTypeId,
-        string sortOrder,
-        string searchString,
+        string selectedStatus,
+        string sortOrder,        
+        int totalItems,
         int page = 1,
         int pageSize = 25)
         {
@@ -27,21 +28,20 @@ namespace EventManager.Models.ViewModels
             {
                 ItemsPerPage = pageSize,
                 CurrentPage = page,
-                TotalItems = registrations.Count(),
+                TotalItems = totalItems,
             };
             Registrations = registrations
                 .ToList()
                 .ConvertAll(x => new RegistrationIndexViewModelRegistrationItem(x));
             Users = users;
-            Events = events;
-            EventTypes = eventTypes;
+            Events = events; 
+            RegistrationStatuses = regStatuses;
             SelectedUserId = selectedUserId;
             SelectedEventId = selectedEventId;
-            SelectedEventTypeId = selectedEventId;
+            SelectedStatus = selectedStatus;
             CurrentSort = sortOrder;
-            CurrentFilter = searchString;
-            ApplySort(sortOrder);
-            ApplyFilter(searchString);
+            CurrentFilter = "";
+            ApplySort(sortOrder);            
 
         }
         public string UserIdSort { get; private set; }
@@ -50,13 +50,14 @@ namespace EventManager.Models.ViewModels
         public string RegistrationDateSort { get; private set; }
         public int SelectedUserId { get; private set; }
         public int SelectedEventId { get; private set; }
-        public int SelectedEventTypeId { get; private set; }
+        public string SelectedStatus { get; private set; }
 
         public IEnumerable<RegistrationIndexViewModelRegistrationItem> Registrations { get; private set;}
 
         public SelectList Users { get; private set; }
         public SelectList Events { get; private set; }
-        public SelectList EventTypes { get; private set;}
+        public SelectList RegistrationStatuses { get; private set;}
+
 
         private void ApplySort(string sortOrder)
         {            
@@ -92,22 +93,6 @@ namespace EventManager.Models.ViewModels
             EventIdSort = sortOrder == "EventId" ? "eventId_desc" : "EventId";
             EventTypeSort = sortOrder == "EventTypeId" ? "eventTypeId_desc" : "EventTypeId";
         }
-        private void ApplyFilter(string searchString)
-        {
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                char[] arr = searchString.ToCharArray();
-                arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c)
-                                  || char.IsWhiteSpace(c)
-                                  || c == '-')));
-                string lowerString = new string(arr);
-                lowerString = lowerString.ToLower();
-                Registrations = Registrations
-                    .Where(x => x.UserName.ToLower().Contains(lowerString)
-                        || x.EventTitle.ToLower().Contains(lowerString))
-                    .ToList();
-            }
-        }
     }
     public class RegistrationIndexViewModelRegistrationItem
     {
@@ -119,7 +104,7 @@ namespace EventManager.Models.ViewModels
         public string EventTypeName { get; private set; }
         public string RegistrationDate { get; private set; }
         public string EventDate { get; private set; }
-
+        public string Status { get; private set;}
         public RegistrationIndexViewModelRegistrationItem(Registration r)
         {
             if (r == null)
@@ -148,6 +133,7 @@ namespace EventManager.Models.ViewModels
                 EventTypeName = r.Event.EventType.EventTypeName;
                 RegistrationDate = r.TimeStamp.ToString("MM/dd/yy HH:mm");
                 EventDate = r.Event.StartDate.ToString("HH/dd/yy HH:mm");
+                Status = r.Status.ToString();
             }
 
         }

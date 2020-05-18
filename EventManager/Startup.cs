@@ -40,8 +40,10 @@ namespace EventManager
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddHttpContextAccessor();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            
             services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IRegistrationService, RegistrationService>();
             services.AddAuthentication(Microsoft.AspNetCore.Server.IISIntegration.IISDefaults.AuthenticationScheme);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -59,7 +61,7 @@ namespace EventManager
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                DataInitializer.SeedData(new UnitOfWork(context));
+                DataInitializer seedData = new DataInitializer(context);
             }
             else
             {

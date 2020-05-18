@@ -17,6 +17,7 @@ namespace EventManager.Models.ViewModels
             int selectedRankId,
             string sortOrder, 
             string searchString, 
+            int totalItems = 0,
             int page = 1, 
             int pageSize = 25
             )
@@ -24,7 +25,7 @@ namespace EventManager.Models.ViewModels
             PagingInfo = new PagingInfo { 
                 ItemsPerPage = 25,
                 CurrentPage = page,
-                TotalItems = users.Count()
+                TotalItems = totalItems
             };
             CurrentFilter = searchString;
             CurrentSort = sortOrder;
@@ -32,7 +33,6 @@ namespace EventManager.Models.ViewModels
             Users = users.ToList().ConvertAll(x => new UserIndexViewModelUserItem(x));
             Ranks = ranks;
             ApplySort(sortOrder);
-            ApplyFilter(searchString);
 
         }
         public string LastNameSort { get; private set; }

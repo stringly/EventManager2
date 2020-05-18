@@ -9,18 +9,18 @@ namespace EventManager.Models.ViewModels
 {
     public class RankIndexViewModel : IndexViewModel
     {
-        public RankIndexViewModel(IEnumerable<Rank> ranks, string sortOrder, string searchString, int page = 1, int pageSize = 25)
+        public RankIndexViewModel(IEnumerable<Rank> ranks, string sortOrder, string searchString, int totalItems = 0, int page = 1, int pageSize = 25)
         {
             PagingInfo = new PagingInfo { 
                 ItemsPerPage = pageSize,
                 CurrentPage = page,
-                TotalItems = ranks.Count()
+                TotalItems = totalItems
             };
             CurrentSort = sortOrder;
             CurrentFilter = searchString;
             Ranks = ranks.ToList().ConvertAll(x => new RankIndexViewModelRankItem(x));
             ApplySort(sortOrder);
-            ApplyFilter(searchString);
+            //ApplyFilter(searchString);
 
         }
         public string RankIdSort { get; private set; }

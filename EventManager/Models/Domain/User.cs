@@ -5,31 +5,19 @@ using System.Linq;
 
 namespace EventManager.Models.Domain
 {
-    public class User
+    public class User : IEntity
     {
         private User() { }
 
         public User(string LDAPName, uint blueDeckId, string firstName, string lastName, string idNumber, string email, string contactNumber, Rank rank)
         {
-
-            _LDAPName = !string.IsNullOrWhiteSpace(LDAPName) ? LDAPName  : throw new ArgumentException("Cannot set LDAP Name to empty string", nameof(LDAPName));
-            _blueDeckId = blueDeckId;
-            _idNumber = idNumber;
-            _email = !string.IsNullOrWhiteSpace(email) ? email : throw new ArgumentException("Cannot set Email to empty string", nameof(email));
-            _contactNumber = contactNumber;
-            Rank = rank != null ? rank : throw new ArgumentException("User Rank cannot be null", nameof(rank));
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                throw new ArgumentException("First name cannot be empty string", nameof(firstName));
-            }
-            else if (string.IsNullOrWhiteSpace(lastName))
-            {
-                throw new ArgumentException("Last name cannot be empty string", nameof(lastName));
-            }
-            else
-            {
-                NameFactory = PersonFullName.Create(firstName, lastName);
-            }
+            UpdateLDAPName(LDAPName);
+            UpdateBlueDeckId(blueDeckId);
+            UpdateName(PersonFullName.Create(firstName, lastName));
+            UpdateIdNumber(idNumber);
+            UpdateEmail(email);
+            UpdateContactNumber(contactNumber);
+            UpdateRank(rank);
             _registrations = new List<Registration>();
             _ownedEvents = new List<Event>();
             
@@ -91,6 +79,10 @@ namespace EventManager.Models.Domain
             if (string.IsNullOrEmpty(newEmail))
             {
                 throw new ArgumentException("Cannot set email to null or empty string", nameof(newEmail));
+            }
+            else
+            {
+                _email = newEmail;
             }
         } 
         public void UpdateContactNumber(string newNumber)

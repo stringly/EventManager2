@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static EventManager.Models.Domain.Registration;
 
 namespace EventManager.Models.Domain
 {
     /// <summary>
     /// Domain Entity Class that represents an Event for which Users can register
     /// </summary>
-    public class Event
+    public class Event : IEntity
     {
         private Event()
         {
@@ -16,7 +17,8 @@ namespace EventManager.Models.Domain
         public Event(
             EventType type, 
             Address location,
-            User creator,
+            User owner,
+            EventSeries series,
             string title, 
             string description,              
             DateTime startDate, 
@@ -24,101 +26,46 @@ namespace EventManager.Models.Domain
             DateTime registrationOpenDate,
             DateTime? registrationClosedDate = null,
             int maxRegistrations = 1,
-            int? minRegistrations = 0,
+            int minRegistrations = 0,
             bool allowStandbyRegistrations = false,
-            int? maxStandbyRegistrations = 0,
-            string fundCenter = ""
+            int maxStandbyRegistrations = 0,
+            string fundCenter = ""             
             )
         {
-            if (string.IsNullOrWhiteSpace(title))
+            UpdateEventType(type);
+            UpdateEventLocation(location);
+            UpdateOwner(owner);
+            if(series == null)
             {
-                throw new ArgumentException("Event title cannot be a null or empty string.", nameof(title));
+                RemoveEventFromSeries();
             }
             else
             {
-                _title = title;
+                AddEventToSeries(series);
             }
-            if (string.IsNullOrWhiteSpace(description))
+            UpdateTitle(title);
+            UpdateDescription(description);
+            UpdateEventDates(startDate, endDate);
+            UpdateRegistrationPeriodDates(registrationOpenDate, registrationClosedDate);
+            if(maxRegistrations > 0)
             {
-                throw new ArgumentException("Event description cannot be a null or empty string.", nameof(description));
-            }
-            else
-            {
-                _description = description;
-            }           
-            if (startDate < DateTime.Now)
-            {
-                throw new ArgumentException("Event Start Date cannot be in the past.", nameof(startDate));
+                UpdateMaximumRegistrationsAllowedCount((uint)maxRegistrations);
             }
             else
             {
-                StartDate = startDate;
-            } 
-            if (endDate < startDate)
+                UpdateMaximumRegistrationsAllowedCount(1);
+            }            
+            UpdateMinimumRegistrationRequiredCount((uint)minRegistrations);
+            if (allowStandbyRegistrations && maxStandbyRegistrations > 0)
             {
-                throw new ArgumentException("Event End Date cannot be before the Event Start Date.", nameof(endDate));
+                AllowStandByRegistrations((uint)maxStandbyRegistrations);
             }
             else
             {
-                EndDate = endDate;
+                PreventStandByRegistrations();
             }
-            if (registrationOpenDate > startDate)
-            {
-                throw new ArgumentException("Registration Period Closed Open Date cannot be after Event Start Date.", nameof(registrationOpenDate));
-            }
-            else
-            {
-                RegistrationOpenDate = registrationOpenDate;
-                
-            }
-            if (registrationClosedDate == null)
-            {
-                RegistrationClosedDate = startDate;
-            }
-            else
-            {
-                if (registrationClosedDate > startDate)
-                {
-                    throw new ArgumentException("Registration Period Closed date cannot be after Event Start Date.", nameof(registrationClosedDate));
-                }
-                else
-                {
-                    RegistrationClosedDate = Convert.ToDateTime(registrationClosedDate);
-                }
-            }
-            
-            if (type == null)
-            {
-                throw new ArgumentNullException("Requires Event Type of type EventManager.EventType.", nameof(type));
-            }
-            else
-            {
-                EventType = type;
-            }
-            if (creator == null)
-            {
-                throw new ArgumentNullException("Requires Creator of type EventManager.User.", nameof(creator));
-            }
-            else
-            {
-                Owner = creator;
-            }
-            MinimumRegistrationsCount = minRegistrations != null ? (uint)minRegistrations : 0;
-            MaximumRegistrationsCount = (uint)maxRegistrations;
-            StandbyRegistrationsAllowed = allowStandbyRegistrations;
-            MaximumStandbyRegistrationsCount = maxStandbyRegistrations != null ? (uint)maxStandbyRegistrations : 0;
-            if(location == null || location.IsEmpty())
-            {
-                throw new ArgumentException("Address is null or empty.", nameof(location));
-            }
-            else
-            {
-                AddressFactory = location;
-            }
-            
-            _fundCenter = fundCenter;
+            UpdateFundCenter(fundCenter);
             _registrations = new List<Registration>();
-     
         }
         /// <summary>
         /// The Event's Identity Primary Key
@@ -228,7 +175,7 @@ namespace EventManager.Models.Domain
         /// <summary>
         /// Encapsulated collection of Registrations
         /// </summary>
-        public IEnumerable<Registration> Registrations => _registrations.ToList();
+        public IEnumerable<Registration> Registrations => _registrations?.ToList() ?? null;
         private ICollection<Registration> _registrations;
 
         public void UpdateTitle(string newTitle)
@@ -244,7 +191,7 @@ namespace EventManager.Models.Domain
         }
         public void UpdateDescription(string newDescription)
         {
-            if (String.IsNullOrWhiteSpace(newDescription))
+            if (!String.IsNullOrWhiteSpace(newDescription))
             {
                 _description = newDescription;
             }
@@ -257,66 +204,104 @@ namespace EventManager.Models.Domain
         {
             _fundCenter = newFundCenter;
         }
-        public void UpdateStartDate(DateTime newStartDate)
+        public void UpdateEventDates(DateTime? newStartDate = null, DateTime? newEndDate = null)
         {
-            if (newStartDate > EndDate)
+            if(newStartDate == null && newEndDate == null)
             {
-                throw new ArgumentException("Event Start Date cannot be after End Date.", nameof(newStartDate));
+                return;
             }
-            StartDate = newStartDate;
-            if(RegistrationClosedDate < newStartDate)
+            else if (newStartDate != null && newEndDate == null)
             {
-                RegistrationClosedDate = newStartDate;
+                // User is changing only the Event Start, so check the new Start Date against the property current value
+                if (newStartDate > EndDate)
+                {
+                    throw new ArgumentException("Event Start Date cannot be after End Date.", nameof(newStartDate));
+                }
             }
-        }
-        public void UpdateEndDate(DateTime newEndDate)
-        {
-            if(newEndDate < StartDate)
+            else if (newStartDate == null && newEndDate != null)
             {
-                throw new ArgumentException("Event End Date cannot precede Start Date.", nameof(newEndDate));
+                // User is changing only the Event End date, so check the new End Date against the property current value
+                if (newEndDate < StartDate)
+                {
+                    throw new ArgumentException("Event End Date cannot precede Start Date.", nameof(newEndDate));
+                }
             }
             else
             {
-                EndDate = newEndDate;
-            }            
+                // User is Changing both dates, so check the dates against each other
+                if(newStartDate > newEndDate)
+                {
+                    throw new ArgumentException("Event End Date cannot precede Start Date.", nameof(newEndDate));
+                }
+                else
+                {
+                    // all conditions pass, set the Properties to the new value
+                    StartDate = Convert.ToDateTime(newStartDate);
+                    EndDate = Convert.ToDateTime(newEndDate);
+                }
+            }
         }
-        public void UpdateRegistrationPeriodStartDate(DateTime newStartDate)
+        public void UpdateRegistrationPeriodDates(DateTime? newStartDate, DateTime? newEndDate)
         {
-            if (newStartDate > RegistrationClosedDate)
+            if (newStartDate == null && newEndDate == null)
             {
-                throw new ArgumentException("Event Registration Period Start Date cannot be after Registration Period End Date.", nameof(newStartDate));
+                return;
             }
-            else if(newStartDate > StartDate)
+            else if (newStartDate != null && newEndDate == null)
             {
-                throw new ArgumentException("Event Registration Period Start Date cannot be after Event Start Date", nameof(newStartDate));
+                // User is changing only the Registration Period Start, so check the new Start Date against the property current value
+                if (newStartDate > StartDate)
+                {
+                    throw new ArgumentException("Registration Period Start Date cannot be after Event Start Date.", nameof(newStartDate));
+                }
+                else if(newStartDate > RegistrationClosedDate)
+                {
+                    throw new ArgumentException("Registration Period Start Date cannot be after current Registration Period End Date.", nameof(newStartDate));
+                }
+                RegistrationOpenDate = Convert.ToDateTime(newStartDate);
+                
             }
-            else if(newStartDate > EndDate)
+            else if (newStartDate == null && newEndDate != null)
             {
-                throw new ArgumentException("Event Registration Period Start Date cannot be after Event End Date", nameof(newStartDate));
+                // User is changing only the Registration Period End date, so check the new End Date against the property current value
+                if (newEndDate < RegistrationOpenDate)
+                {
+                    throw new ArgumentException("Registration Period End Date cannot precede Registration Period Start Date.", nameof(newEndDate));
+                }
+                else if(newEndDate > EndDate){
+                    throw new ArgumentException("Registration Period End Date cannot be after Event End Date.", nameof(newEndDate));
+                }
+                RegistrationClosedDate = Convert.ToDateTime(newEndDate);
             }
             else
             {
-                RegistrationOpenDate = newStartDate;
+                // User is Changing both dates, so check the dates against each other
+                if (newStartDate > newEndDate)
+                {
+                    throw new ArgumentException("Registration Period End Date cannot precede Registration Period Start Date.", nameof(newEndDate));
+                }
+                else if(newStartDate > StartDate)
+                {
+                    throw new ArgumentException("Registration Period Start Date cannot be after Event Start Date.", nameof(newEndDate));
+                }
+                else if(newEndDate > EndDate)
+                {
+                    throw new ArgumentException("Registration Period End Date cannot be after Event End Date.", nameof(newEndDate));
+                }
+                else
+                {
+                    // all conditions pass, set the Properties to the new value
+                    RegistrationOpenDate = Convert.ToDateTime(newStartDate);
+                    RegistrationClosedDate = Convert.ToDateTime(newEndDate);
+                }
             }
         }
-        public void UpdateRegistrationPeriodEndDate(DateTime newEndDate)
-        {
-            if (newEndDate > StartDate)
-            {
-                throw new ArgumentException("Event Registration Period End Date cannot be after Event End Date", nameof(newEndDate));
-            }
-            else if (newEndDate < RegistrationOpenDate)
-            {
-                throw new ArgumentException("Event Registration Period End Date cannot precede Registration Period Start Date.", nameof(newEndDate));
-            }
-            else
-            {
-                RegistrationClosedDate = newEndDate;
-            }            
-        }
-
         public void UpdateMinimumRegistrationRequiredCount(uint newCount)
         {
+            if (newCount > MaximumRegistrationsCount)
+            {
+                throw new ArgumentException("An Event cannot have more Minimum required Registrations than it's Maximum registration count.");
+            }
             MinimumRegistrationsCount = newCount;
         }
         public void UpdateMaximumRegistrationsAllowedCount(uint newCount)
@@ -369,11 +354,35 @@ namespace EventManager.Models.Domain
                 EventType = type;
             }
         }                
+        public void AddEventToSeries(EventSeries es)
+        {
+            if (es == null)
+            {
+                throw new ArgumentNullException("Cannot assign Event to null Event Series object.", nameof(es));
+            }
+            else
+            {
+                EventSeriesId = es.Id;
+            }
+        }
+        public void RemoveEventFromSeries()
+        {
+            EventSeriesId = null;
+        }
+        public void UpdateOwner(User owner)
+        {
+            if(owner == null)
+            {
+                throw new ArgumentNullException("Cannot assign Event to null User.", nameof(owner));
+            }
+            OwnerId = owner.Id;
+        }
         public bool IsAcceptingRegistrations()
         {
+            EnsureRegistrationsLoaded();
             // Return false if Event Start Date is in the past
             if (StartDate < DateTime.Now)
-            {
+            {                
                 return false;
             }
             // Return False if the Registration Period Start Date is in the future OR the Registration Period Close Date is in the past
@@ -382,7 +391,7 @@ namespace EventManager.Models.Domain
                 return false;
             }
             // Return false if the Maximum registration count has been reached
-            else if (Registrations?.Count(x => x.IsActive == true) >= MaximumRegistrationsCount)
+            else if (Registrations.Count(x => x.IsActive == true) >= MaximumRegistrationsCount)
             { 
                 return false;
             }
@@ -391,33 +400,64 @@ namespace EventManager.Models.Domain
                 return true;
             }
         }
-
+        public string GetEventStatus()
+        {
+            EnsureRegistrationsLoaded();
+            if (IsAcceptingRegistrations())
+            {
+                return "Accepting Registrations";
+            }
+            else if(EndDate < DateTime.Now)
+            {
+                return "Expired";
+            }
+            else if (StartDate < DateTime.Now && EndDate > DateTime.Now)
+            {
+                return "In progress";
+            }
+            else if (RegistrationOpenDate > DateTime.Now)
+            {
+                return "Registration Period Pending";
+            }
+            else if(RegistrationClosedDate < DateTime.Now && StartDate > DateTime.Now)
+            {
+                return "Event Pending/Registrations closed.";
+            }
+            else if(StartDate > DateTime.Now && Registrations.Count() == MaximumRegistrationsCount)
+            {
+                return "Event Pending/Registrations Full";
+            }
+            else
+            {
+                return "Unknown";
+            }
+        }
         public IEnumerable<Registration> GetActiveRegistrations()
         {
-            return Registrations?.Where(x => x.IsActive).ToList() ?? new List<Registration>();
+            EnsureRegistrationsLoaded();
+            return Registrations.Where(x => x.IsActive).ToList();
         }
         public IEnumerable<Registration> GetStandbyRegistrations()
         {
-            return Registrations?.Where(x => x.IsStandy).ToList() ?? new List<Registration>();
+            EnsureRegistrationsLoaded();
+            return Registrations.Where(x => x.IsStandy).ToList();
         }
 
         public IEnumerable<Registration> GetPendingRegistrations()
         {
-            return Registrations?.Where(x => x.IsPending).ToList() ?? new List<Registration>();
+            EnsureRegistrationsLoaded();
+            return Registrations.Where(x => x.IsPending).ToList();
         }
         public IEnumerable<Registration> GetRejectedRegistrations()
         {
-            return Registrations?.Where(x => x.IsRejected).ToList() ?? new List<Registration>();
+            EnsureRegistrationsLoaded();
+            return Registrations.Where(x => x.IsRejected).ToList();
         }
-        public bool AddRegistration(User u, Registration.RegistrationStatus status, out string response)
+        public bool AddRegistration(User u, RegistrationStatus status, out string response)
         {
-            if (_registrations == null)
-            {
-                response = "You must first retrieve this Event's existing list of registrations";
-                return false;
-            }
-            var foundUserRegistration = _registrations.Where(x => x.UserId == u.Id).FirstOrDefault();
-            if (foundUserRegistration == null)
+            EnsureRegistrationsLoaded();
+            Registration foundRegistration = GetRegistrationFromEventRegistrationsByUserId(u.Id);
+            if (foundRegistration == null)
             {
                 _registrations.Add(new Registration(u, this, status));
                 response = "Registration added to event.";
@@ -429,25 +469,42 @@ namespace EventManager.Models.Domain
                 return false;
             }
         }
-        public bool RemoveRegistration(User u, out string response)
+        public bool RemoveRegistration(int registrationId, out string response)
         {
-            if (_registrations == null)
+            EnsureRegistrationsLoaded();
+            Registration foundRegistration = GetRegistrationFromEventRegistrationsByRegistrationId(registrationId);
+            if (foundRegistration != null)
             {
-                response = "You must first retrieve this Event's existing list of registrations";
-                return false;
-            }
-            var foundUserRegistration = _registrations.Where(x => x.UserId == u.Id).FirstOrDefault();
-            if (foundUserRegistration == null)
-            {
-                _registrations.Remove(foundUserRegistration);
+                _registrations.Remove(foundRegistration);
                 response = "Registration removed from event.";
                 return true;
             }
             else
             {
-                response = "User is not registered for this event";
+                response = $"Registration was not found for this event";
                 return false;
             }
+        }
+        public bool AcceptRegistration(int registrationId, out string response)
+        {
+            //EnsureRegistrationsLoaded();
+            throw new NotImplementedException();
+        }
+        public void EnsureRegistrationsLoaded()
+        {
+            if(_registrations == null)
+            {
+                throw new NullReferenceException("Registration collection is not loaded for this Event.");
+            }
+
+        }
+        private Registration GetRegistrationFromEventRegistrationsByRegistrationId(int registrationId)
+        {
+            return _registrations.Where(x => x.Id == registrationId).FirstOrDefault();
+        }
+        private Registration GetRegistrationFromEventRegistrationsByUserId(int userId)
+        {
+            return _registrations.Where(x => x.UserId == userId).FirstOrDefault();
         }
     }
 }

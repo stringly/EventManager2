@@ -18,18 +18,21 @@ namespace EventManager.Data.Persistence.Repositories
         public EventManagerContext EventManagerContext {
             get { return context as EventManagerContext; }
         }
-        public IEnumerable<Rank> GetRanksWithUsers(int page = 1, int pageSize = 25)
+        public IEnumerable<Rank> GetRanksWithUsers(string searchString = "", int page = 1, int pageSize = 25)
         {
+        
             return EventManagerContext.Ranks
+                .Where(x => (string.IsNullOrEmpty(searchString) || (x.FullName.ToLower().Contains(searchString) || x.ShortName.ToLower().Contains(searchString))))
                 .Skip((page-1) * pageSize)
                 .Take(pageSize)
                 .Include(x => x.Users)
                     .ThenInclude(x => x.Rank);
-        }
+        }        
 
-        public async Task<IEnumerable<Rank>> GetRanksWithUsersAsync(int page = 1, int pageSize = 25)
+        public async Task<IEnumerable<Rank>> GetRanksWithUsersAsync(string searchString = "", int page = 1, int pageSize = 25)
         {
             return await EventManagerContext.Ranks
+                .Where(x => (string.IsNullOrEmpty(searchString) || (x.FullName.ToLower().Contains(searchString) || x.ShortName.ToLower().Contains(searchString))))
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(x => x.Users)
@@ -47,7 +50,6 @@ namespace EventManager.Data.Persistence.Repositories
                 return await EventManagerContext.Ranks.FirstOrDefaultAsync(x => x.Full == rankFullName);
             }
         }
-
         public Rank GetRankByFullName(string rankFullName)
         {
             if (string.IsNullOrWhiteSpace(rankFullName))
@@ -63,7 +65,25 @@ namespace EventManager.Data.Persistence.Repositories
         {
             return new SelectList(EventManagerContext.Ranks, nameof(Rank.Id), nameof(Rank.Full));
         }
+        public async Task<SelectList> GetRankSelectListAsync()
+        {
+            return new SelectList(await EventManagerContext.Ranks.ToListAsync(), nameof(Rank.Id), nameof(Rank.Full));
+        }
 
+        public async Task<Rank> GetRankWithUsersAsync(int rankId)
+        {
+            return await EventManagerContext.Ranks
+                .Include(x => x.Users)
+                    .ThenInclude(x => x.Rank)
+                .FirstOrDefaultAsync(x => x.Id == rankId);                
+        }
 
+        public Rank GetRankWithUsers(int rankId)
+        {
+            return EventManagerContext.Ranks
+                .Include(x => x.Users)
+                    .ThenInclude(x => x.Rank)
+                .FirstOrDefault(x => x.Id == rankId);
+        }
     }
 }
