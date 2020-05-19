@@ -41,7 +41,9 @@ namespace EventManager.Models.Domain
         public IEnumerable<Registration> Registrations => _registrations.ToList();
         private ICollection<Registration> _registrations;
         public IEnumerable<Event> OwnedEvents => _ownedEvents.ToList();
-        private ICollection<Event> _ownedEvents;        
+        private ICollection<Event> _ownedEvents;
+        public IEnumerable<Attendance> Attendance => _attendance.ToList();
+        private ICollection<Attendance> _attendance;
         public string DisplayName => $"{Rank?.ShortName ?? ""} {Name} {(String.IsNullOrEmpty(IdNumber) ? "" : $"#{IdNumber}")}";
 
         public void UpdateLDAPName(string newName)

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static EventManager.Models.Domain.Attendance;
 using static EventManager.Models.Domain.Registration;
 
 namespace EventManager.Models.Domain
@@ -29,7 +30,8 @@ namespace EventManager.Models.Domain
             int minRegistrations = 0,
             bool allowStandbyRegistrations = false,
             int maxStandbyRegistrations = 0,
-            string fundCenter = ""             
+            string fundCenter = "",
+            List<EventModule> modules = null
             )
         {
             UpdateEventType(type);
@@ -65,6 +67,15 @@ namespace EventManager.Models.Domain
                 PreventStandByRegistrations();
             }
             UpdateFundCenter(fundCenter);
+            if(modules != null)
+            {
+                HasModules = true;
+                AddEventModules(modules);
+            }
+            else
+            {
+                HasModules = false;
+            }
             _registrations = new List<Registration>();
         }
         /// <summary>
@@ -177,7 +188,29 @@ namespace EventManager.Models.Domain
         /// </summary>
         public IEnumerable<Registration> Registrations => _registrations?.ToList() ?? null;
         private ICollection<Registration> _registrations;
-
+        public bool HasModules { get; private set; }
+        private ICollection<EventModule> _eventModules;
+        public IEnumerable<EventModule> EventModules => _eventModules.ToList();
+        private ICollection<Attendance> _attendance;
+        public IEnumerable<Attendance> Attendance 
+            { get 
+                { 
+                    if (!HasModules)
+                    {
+                        return _attendance?.ToList() ?? null;
+                    }
+                    else 
+                    {
+                        EnsureEventModulesLoaded();
+                        List<Attendance> allAttendance = new List<Attendance>();
+                        foreach(EventModule em in _eventModules)
+                        {
+                            allAttendance.AddRange(em.Attendance);
+                        }
+                        return allAttendance;
+                    }
+                } 
+            }
         public void UpdateTitle(string newTitle)
         {
             if (String.IsNullOrWhiteSpace(newTitle))
@@ -442,7 +475,6 @@ namespace EventManager.Models.Domain
             EnsureRegistrationsLoaded();
             return Registrations.Where(x => x.IsStandy).ToList();
         }
-
         public IEnumerable<Registration> GetPendingRegistrations()
         {
             EnsureRegistrationsLoaded();
@@ -498,6 +530,14 @@ namespace EventManager.Models.Domain
             }
 
         }
+        public void EnsureRegistrationsWithUsersLoaded()
+        {
+            EnsureRegistrationsLoaded();
+            if(_registrations.Count() > 0 && _registrations.First()?.User == null)
+            {
+                throw new NullReferenceException("Registration collection with Users is not loaded for this Event.");
+            }
+        }
         private Registration GetRegistrationFromEventRegistrationsByRegistrationId(int registrationId)
         {
             return _registrations.Where(x => x.Id == registrationId).FirstOrDefault();
@@ -505,6 +545,210 @@ namespace EventManager.Models.Domain
         private Registration GetRegistrationFromEventRegistrationsByUserId(int userId)
         {
             return _registrations.Where(x => x.UserId == userId).FirstOrDefault();
+        }
+        public bool AddEventModules(IEnumerable<EventModule> modules)
+        {
+            // ensure attendance records are loaded
+            EnsureAttendanceLoaded();
+            // if the Event itself already has attendance records, no Modules can be added. Throw an error
+            if(_attendance.Count() > 0)
+            {
+                throw new InvalidOperationException($"Cannot add Modules to Event: The Event has existing attendance records.");
+            }
+            // Ensure Event Modules are loaded
+            EnsureEventModulesLoaded();
+            foreach(EventModule e in modules)
+            {
+                // Check to make sure no new Modules use the Title of an existing Module.
+                if(_eventModules.Any(x => x.Title == e.Title))
+                {
+                    throw new ArgumentException($"Cannot add Module to Event: The Event already has a module with the title {e.Title}");
+                }
+                else
+                {                    
+                    _eventModules.Add(e);
+                    if (!HasModules)
+                    {
+                        HasModules = true;
+                    }
+                }
+            }
+            return true;
+        }
+        public bool AddEventModule(EventModule module)
+        {
+            // ensure attendance records are loaded
+            EnsureAttendanceLoaded();
+            // if the Event itself already has attendance records, no Modules can be added. Throw an error
+            if (_attendance.Count() > 0)
+            {
+                throw new InvalidOperationException($"Cannot add Module to Event: The Event has existing attendance records.");
+            }
+            // Ensure Event Modules are loaded.
+            EnsureEventModulesLoaded();
+            // Check to make sure no new Modules use the Title of an existing Module.
+            if (_eventModules.Any(x => x.Title == module.Title))
+            {
+                throw new ArgumentException($"Cannot add Module to Event: The Event already has a module with the title {module.Title}");
+            }
+            else
+            {
+                _eventModules.Add(module);
+                if (!HasModules)
+                {
+                    HasModules = true;
+                }
+                return true;
+            }
+        }
+        public bool UpdateEventModuleTitle(int id, string newTitle)
+        {
+            EnsureEventModulesLoaded();
+            EventModule em = _eventModules.FirstOrDefault(x => x.Id == id);
+            if(em == null)
+            {
+                throw new ArgumentException($"Cannot update Event Module Title: No Event Module with id {id} was found in the Event's collection");
+            }
+            else
+            {
+                em.UpdateTitle(newTitle);
+                return true;
+            }
+        }
+        public bool UpdateEventModuleDescription(int id, string newDescription)
+        {
+            EnsureEventModulesLoaded();
+            EventModule em = _eventModules.FirstOrDefault(x => x.Id == id);
+            if (em == null)
+            {
+                throw new ArgumentException($"Cannot update Event Module description: No Event Module with id {id} was found in the Event's Collection");
+            }
+            else
+            {
+                em.UpdateDescription(newDescription);
+                return true;
+            }
+        }
+        public bool RemoveEventModule(int id)
+        {
+            // Ensure the Event's Modules are loaded
+            EnsureEventModulesLoaded();
+            // Attempt to locate a Module in the Event's Modules with the given Id.
+            EventModule em = _eventModules.FirstOrDefault(x => x.Id == id);
+            // If no Module is found, throw an error.
+            if (em == null)
+            {
+                throw new ArgumentException($"Cannot remove Module from Event: Event has no module with id {id}");
+            }
+            else
+            {
+                // TODO: Verify that Attendance records for a deleted Event Module are also deleted
+                // Retrieve the attendance records for the Event Module being removed.
+                IEnumerable<Attendance> toRemove = em.Attendance;
+                // Remove the attendance records
+                em.RemoveAttendanceRecordsByRange(toRemove);                
+                // then remove the Module
+                _eventModules.Remove(em);
+                // check to see if the removed Module was the last Event Module for the Event
+                if(_eventModules.Count() == 0)
+                {
+                    // if the Event no longer has any Modules, set the module flag to false.
+                    if (HasModules)
+                    {
+                        HasModules = false;
+                    }                    
+                }
+                return true;
+            }
+        }
+        private void EnsureEventModulesLoaded()
+        {
+            if (_eventModules == null)
+            {
+                throw new NullReferenceException("You must load the Event's EventModules collection first.");
+            }
+        }
+        public void EnsureAttendanceLoaded()
+        {
+            if (_attendance == null)
+            {
+                throw new NullReferenceException("You must load the Event's Attendance collection first.");
+            }
+        }
+        public bool UpdateAttendance(int userId, AttendanceStatus status, int moduleId = 0)
+        {
+            
+            EnsureRegistrationsWithUsersLoaded();
+            // Ensure the User is registered for Event. Attendance records can only be created for Users registered for the event.
+            Registration r = _registrations.FirstOrDefault(x => x.UserId == userId);
+            if(r == null)
+            {
+                throw new ArgumentException($"Cannot update Attendance: No User with id {userId} is registered for this Event.");
+            }
+            // Check if the Event has modules
+
+            // Event has modules
+            if (HasModules) 
+            {
+                // Event has modules, so if the moduleId parameter is 0, we must throw an error. Events with modules can only create Attendance records for the modules, not the Event itself
+                if (moduleId == 0) 
+                {
+                    throw new ArgumentException($"Cannot update Attendance: The Event has modules. Attendance records can only be created for the Modules, not the Event itself.");
+                }
+                else
+                {   
+                    // Ensure the modules are loaded
+                    EnsureEventModulesLoaded();
+                    // attempt to retrieve the module
+                    EventModule em = _eventModules.FirstOrDefault(x => x.Id == moduleId);
+
+                    if(em == null)
+                    {
+                        // if the module was not found, we must throw an error
+                        throw new ArgumentException($"Cannot update Attendance: The Event has no module with id {moduleId}");
+                    }
+                    else
+                    {
+                        // Module was found
+                        // Attempt to find an existing registration record
+                        Attendance a = em.Attendance.FirstOrDefault(x => x.AttendeeId == userId);
+                        if (a == null)
+                        {
+                            // no existing attendance record was found, so we create a new record
+                            a = new Attendance(r.User, this, status);
+                            
+                            return true;
+                        }
+                        else
+                        {
+                            // an existing attendance record was found, so we update the status
+                            a.UpdateStatus(status);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // Event has no modules
+            else
+            {
+                // Ensure attendance records are loaded
+                EnsureAttendanceLoaded();
+                Attendance a = _attendance.FirstOrDefault(x => x.AttendeeId == userId );
+                if(a == null)
+                {
+                    // no existing attendance record exists, so we create a new record
+                    a = new Attendance(r.User, this, status);
+                    _attendance.Add(a);
+                    return true;
+                }
+                else
+                {
+                    // an existing Attendance record was found, so we update the record.
+                    a.UpdateStatus(status);
+                    return true;
+                }
+            }
         }
     }
 }

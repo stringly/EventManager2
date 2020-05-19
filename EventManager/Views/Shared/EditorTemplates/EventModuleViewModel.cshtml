@@ -1,0 +1,44 @@
+﻿@model EventModuleViewModel
+@{ 
+    Guid identifier = Guid.NewGuid();
+}
+    <div class="moduleContainer mb-2 p-2" style="border: 1px solid rgba(0, 0, 0, 0.1)">
+        <input asp-for="Id" />
+        
+        <div class="row">
+            <div class="col-sm-12 form-group">
+                @if (!string.IsNullOrEmpty(Model.Title))
+                {
+                    <strong>@Model.Title</strong>
+                    <div class="btn-group float-right" role="group" aria-label="Basic example">
+                        <button type="button" data-toggle="collapse" href="#collapse-@identifier" class="btn btn-sm btn-default collapseButton">Show</button>
+                        <input asp-for="Deleted" />
+                        <button class="btn btn-sm btn-danger deleteModuleButton" type="button">Delete</button>
+                    </div>
+                }
+                else
+                {
+                    <strong color="text-success">(New Module)</strong>
+                    <input asp-for="Deleted" />
+                    <button class="btn btn-sm btn-danger float-right deleteModuleButton" type="button">Delete</button>
+                }
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            </div>
+        </div>
+        <div class="@(string.IsNullOrEmpty(Model.Title) ? "collapse show" : "collapse")" id="collapse-@identifier">
+            <div class="row">
+                <div class="col-sm-8 form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>

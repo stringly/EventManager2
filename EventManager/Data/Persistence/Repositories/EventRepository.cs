@@ -33,8 +33,9 @@ namespace EventManager.Data.Persistence.Repositories
                 .Take(pageSize)
                 .Include(x => x.Owner)
                         .ThenInclude(x => x.Rank)
-                    .Include(x => x.EventType)
-                    .Include(x => x.EventSeries)
+                .Include(x => x.EventType)
+                .Include(x => x.EventSeries)
+                .Include(x => x.Registrations)
                     .ToListAsync();
         }
         public IEnumerable<Event> GetEventsWithCreatorEventTypeAndSeries(string searchString = "", int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0, int page = 1, int pageSize = 25)

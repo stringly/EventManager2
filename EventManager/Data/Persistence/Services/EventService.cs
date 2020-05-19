@@ -2,6 +2,7 @@
 using EventManager.Data.Core.Services;
 using EventManager.Data.Persistence.Repositories;
 using EventManager.Models.Domain;
+using EventManager.Models.DTOs;
 using EventManager.Models.ViewModels;
 using EventManager.sharedkernel;
 using Microsoft.AspNetCore.Http;
@@ -35,8 +36,27 @@ namespace EventManager.Data.Persistence.Services
         public IEventTypeRepository EventTypes { get; private set; }
         public IRankRepository Ranks { get; private set; }
         public IUserRepository Users { get; private set; }
-        public IRegistrationRepository Registrations { get; private set; }        
-
+        public IRegistrationRepository Registrations { get; private set; }
+        public async Task<IEnumerable<EventDto>> GetEvents(string searchString = "", int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0, int page = 1, int pageSize = 25)
+        {
+            IEnumerable<Event> events =  await Events.GetEventsWithCreatorEventTypeAndSeriesAsnyc(searchString, filterByEventTypeId, filterByCreatorUserId, filterByEventSeriesId, page, pageSize);
+            var result = events.Select(x => new EventDto()
+            {
+                EventId = x.Id,
+                EventTitle = x.Title,
+                EventType = x.EventTypeName,
+                StartDate = x.StartDate.ToString("MM/dd/yy HH:mm"),
+                EndDate = x.EndDate.ToString("MM/dd/yy HH:mm"),
+                EventSeriesId = x?.EventSeriesId ?? 0,
+                EventSeriesTitle = x?.EventSeries?.Title ?? "No Event Series",
+                CreatorId = x.OwnerId,
+                CreatorName = x.Owner.DisplayName,
+                CreatorEmail = x.Owner.Email,
+                Status = x.GetEventStatus()
+            });
+            return result;
+            
+        }
         public bool CreateEvent(
             out string response,
             int eventTypeId,

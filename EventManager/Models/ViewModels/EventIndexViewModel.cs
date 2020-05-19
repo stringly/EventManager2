@@ -1,4 +1,5 @@
 ﻿using EventManager.Models.Domain;
+using EventManager.Models.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace EventManager.Models.ViewModels
         private EventIndexViewModel() { }
 
         public EventIndexViewModel(
-            IEnumerable<Event> events, 
+            IEnumerable<EventDto> events, 
             SelectList users, 
             SelectList eventTypes, 
             int selectedUserId, 
@@ -124,9 +125,23 @@ namespace EventManager.Models.ViewModels
         public string EventTypeName { get; private set; }
         public int CreatedByUserId { get; private set; }
         public string Status { get; private set;}
+        public EventIndexViewModelEventItem(EventDto e)
+        {
+            EventId = e.EventId;            
+            StartDate = e.StartDate;
+            EndDate = e.EndDate;
+            EventTitle = e.EventTitle;
+            EventSeriesTitle = e.EventSeriesTitle;
+            CreatedByUserDisplayName = e.CreatorName;
+            CreatedByUserEmail = e.CreatorEmail;
+            EventTypeName = e.EventType;
+            CreatedByUserId = e.CreatorId;
+            EventSeriesId = e.EventSeriesId;
+            Status = e.Status;
+        }
         public EventIndexViewModelEventItem(Event e)
         {
-            EventId = e.Id;            
+            EventId = e.Id;
             StartDate = e.StartDate.ToString("MM/dd/yy HH:mm");
             EndDate = e.EndDate.ToString("MM/dd/yy HH:mm");
             EventTitle = e.Title;

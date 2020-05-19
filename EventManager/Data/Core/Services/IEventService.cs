@@ -1,4 +1,5 @@
 ﻿using EventManager.Data.Core.Repositories;
+using EventManager.Models.DTOs;
 using EventManager.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace EventManager.Data.Core.Services
         IRankRepository Ranks { get; }
         IUserRepository Users { get; }
         IRegistrationRepository Registrations { get; }
+        Task<IEnumerable<EventDto>> GetEvents(string searchString = "", int filterByEventTypeId = 0, int filterByCreatorUserId = 0, int filterByEventSeriesId = 0, int page = 1, int pageSize = 25);
         int Complete();
         bool CreateEvent(
             out string response,

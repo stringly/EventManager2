@@ -36,7 +36,7 @@ namespace EventManager.Controllers
         public async Task<IActionResult> Index(string sortOrder, string searchString, int SelectedEventTypeId = 0, int SelectedEventSeriesId = 0, int SelectedUserId = 0, int page = 1)
         {
             searchString = searchString.ToLowerRemoveSymbols();
-            IEnumerable<Event> events = await _eventService.Events.GetEventsWithCreatorEventTypeAndSeriesAsnyc(searchString, SelectedEventTypeId, SelectedUserId, 0, page, PageSize);
+            var events = await _eventService.GetEvents(searchString, SelectedEventTypeId, SelectedUserId, 0, page, PageSize);
             int totalItems = 0;
             if (!string.IsNullOrEmpty(searchString) || SelectedEventTypeId != 0 || SelectedEventSeriesId != 0 || SelectedUserId != 0)
             {
@@ -104,7 +104,8 @@ namespace EventManager.Controllers
             "AddressLine2," +
             "City," +
             "State," +
-            "Zip"
+            "Zip," +
+            "Modules"
             )] EventAddViewModel form, string returnUrl)
         {
             if (!ModelState.IsValid)
@@ -342,6 +343,31 @@ namespace EventManager.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }            
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddEventModule([Bind("Modules")] EventAddViewModel form)
+        {
+            if (form.Modules.Count() > 0)
+            {
+                if (ModelState.GetFieldValidationState("Modules") != Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid)
+                {
+                    return PartialView("EventModules", form);
+                }
+            }            
+            form.Modules.Add(new EventModuleViewModel());
+            return PartialView("EventModules", form);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveEventModule([Bind("Modules")] EventAddViewModel form)
+        {
+            ModelState.Clear();
+            if (form.Modules.Count() > 0)
+            {
+                form.Modules = form.Modules.Where(x => x.Deleted == false).ToList();
+            }
+            return PartialView("EventModules", form);
         }
         private bool EventExists(int id)
         {

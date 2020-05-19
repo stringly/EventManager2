@@ -20,12 +20,17 @@ namespace EventManager.Models.ViewModels
             EndDate = defaultDate.AddHours(10);
             RegistrationOpenDate = defaultDate;
             RegistrationClosedDate = defaultDate;
+            Modules = new List<EventModuleViewModel>();
             }
         public EventAddViewModel(Event e)
         {
             if (e == null)
             {
                 throw new ArgumentNullException("Cannot create viewmodel from null Event object", nameof(e));
+            }
+            else if(e.EventModules == null)
+            {
+                throw new ArgumentNullException("Cannot create viewmodel form Event Object with null EventModules collection.", nameof(e.EventModules));
             }
             else
             {
@@ -100,7 +105,8 @@ namespace EventManager.Models.ViewModels
         [Display(Name = "State"), Required]
         public string State { get; set; }
         [Display(Name = "ZIP Code"), Required, StringLength(5)]
-        public string Zip { get; set; }                
+        public string Zip { get; set; }  
+        public List<EventModuleViewModel> Modules { get; set;}
         public SelectList EventTypes { get; set; }
         public SelectList States { get; set; }
         public SelectList EventSerieses { get; set; }

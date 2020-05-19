@@ -1,4 +1,5 @@
 ﻿using EventManager.Models.Domain;
+using EventManager.Models.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
@@ -25,5 +26,6 @@ namespace EventManager.Data.Core.Repositories
         Task<SelectList> GetEventSelectListAsync();
         Event GetEventWithRegistrations(int id);
         Task<Event> GetEventWithRegistrationsAsync(int id);
+        
     }
 }
